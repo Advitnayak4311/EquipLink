@@ -1,0 +1,58 @@
+# ============================================================
+#  EquipLink – Docker Compose Orchestration
+#  Deploys PostgreSQL, Spring Boot Backend, and Next.js Frontend
+# ============================================================
+
+version: '3.8'
+
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: equiplink-db
+    restart: always
+    environment:
+      POSTGRES_DB: equiplink
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: localpassword
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+
+  backend:
+    image: equiplink-backend:latest
+    container_name: equiplink-backend-container
+    build:
+      context: ./backend
+      dockerfile: ../docker/Dockerfile.backend
+    restart: always
+    depends_on:
+      - db
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_PROFILES_ACTIVE: dev
+      DATABASE_URL: jdbc:postgresql://db:5432/equiplink
+      DATABASE_USERNAME: postgres
+      DATABASE_PASSWORD: localpassword
+      JWT_SECRET: equiplink-default-secret-key-change-in-production-env
+      CORS_ALLOWED_ORIGIN: http://localhost:3000
+
+  frontend:
+    image: equiplink-frontend:latest
+    container_name: equiplink-frontend-container
+    build:
+      context: ./frontend
+      dockerfile: ../docker/Dockerfile.frontend
+    restart: always
+    depends_on:
+      - backend
+    ports:
+      - "3000:3000"
+    environment:
+      NEXT_PUBLIC_API_URL: http://localhost:8080/api
+      NEXT_PUBLIC_APP_NAME: EquipLink
+
+volumes:
+  postgres-data:
+    driver: local

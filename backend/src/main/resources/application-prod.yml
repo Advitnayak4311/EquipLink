@@ -1,0 +1,26 @@
+# ============================================================
+#  EquipLink Backend – Production Profile
+# ============================================================
+
+spring:
+  datasource:
+    url: ${DATABASE_URL}
+    username: ${DATABASE_USERNAME}
+    password: ${DATABASE_PASSWORD}
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: validate
+    show-sql: false
+
+app:
+  jwt:
+    secret: ${JWT_SECRET}
+  gemini:
+    api-key: ${GEMINI_API_KEY}
+
+logging:
+  level:
+    com.equiplink: INFO
+    org.springframework.security: WARN

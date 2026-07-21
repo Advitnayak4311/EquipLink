@@ -1,0 +1,40 @@
+# ============================================================
+#  EquipLink Backend – Global YAML Configuration
+# ============================================================
+
+spring:
+  application:
+    name: equiplink-backend
+  profiles:
+    active: dev
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 10MB
+      max-request-size: 30MB
+
+server:
+  port: 8080
+
+# ---- Swagger / OpenAPI ----
+springdoc:
+  api-docs:
+    path: /api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    enabled: true
+
+# ---- Custom App Config Placeholders ----
+app:
+  jwt:
+    cookie-name: equiplink_auth
+    expiration-ms: ${JWT_EXPIRATION_MS:86400000}
+  cors:
+    allowed-origin: ${CORS_ALLOWED_ORIGIN:http://localhost:3000}
+  frontend:
+    url: ${FRONTEND_URL:http://localhost:3000}
+  upload:
+    dir: ${UPLOAD_DIR:uploads}
+  gemini:
+    base-url: https://generativelanguage.googleapis.com/v1beta
+    api-key: ${GEMINI_API_KEY:}
