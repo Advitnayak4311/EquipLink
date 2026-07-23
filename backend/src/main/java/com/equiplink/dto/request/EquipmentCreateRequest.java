@@ -1,6 +1,7 @@
 package com.equiplink.dto.request;
 
 import com.equiplink.entity.enums.EquipmentStatus;
+import com.equiplink.entity.enums.PowerType;
 import jakarta.validation.constraints.*;
 
 import java.math.BigDecimal;
@@ -41,6 +42,14 @@ public record EquipmentCreateRequest(
 
         @NotNull(message = "Availability status is required")
         EquipmentStatus availabilityStatus,
+
+        PowerType powerType,
+
+        Double batteryCapacityKwh,
+
+        String chargingType,
+
+        Boolean evTermsAccepted,
 
         @NotEmpty(message = "At least one image is required")
         List<String> imageUrls

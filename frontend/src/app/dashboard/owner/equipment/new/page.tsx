@@ -27,6 +27,10 @@ export default function NewEquipmentPage() {
         dailyRentalPrice: values.dailyRentalPrice,
         location: values.location,
         availabilityStatus: values.availabilityStatus,
+        powerType: values.powerType,
+        batteryCapacityKwh: values.batteryCapacityKwh,
+        chargingType: values.chargingType,
+        evTermsAccepted: values.evTermsAccepted,
         imageUrls: values.imageUrls,
       });
       toast.success("Equipment listed successfully!");

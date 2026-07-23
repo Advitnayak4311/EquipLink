@@ -21,7 +21,13 @@ public interface EquipmentRepository extends JpaRepository<Equipment, Long>, Jpa
     /**
      * Lists and filters equipment owned by a specific owner.
      */
-    @Query("SELECT e FROM Equipment e WHERE e.owner.email = :email AND " +
+    @Query(value = "SELECT DISTINCT e FROM Equipment e LEFT JOIN FETCH e.owner LEFT JOIN FETCH e.category WHERE e.owner.email = :email AND " +
+           "(:search IS NULL OR LOWER(e.name) LIKE :search " +
+           "OR LOWER(e.brand) LIKE :search " +
+           "OR LOWER(e.model) LIKE :search) AND " +
+           "(:categoryId IS NULL OR e.category.id = :categoryId) AND " +
+           "(:status IS NULL OR e.availabilityStatus = :status)",
+           countQuery = "SELECT COUNT(e) FROM Equipment e WHERE e.owner.email = :email AND " +
            "(:search IS NULL OR LOWER(e.name) LIKE :search " +
            "OR LOWER(e.brand) LIKE :search " +
            "OR LOWER(e.model) LIKE :search) AND " +
@@ -38,7 +44,13 @@ public interface EquipmentRepository extends JpaRepository<Equipment, Long>, Jpa
     /**
      * Public browsing of equipment with search and filters.
      */
-    @Query("SELECT e FROM Equipment e WHERE " +
+    @Query(value = "SELECT DISTINCT e FROM Equipment e LEFT JOIN FETCH e.owner LEFT JOIN FETCH e.category WHERE " +
+           "(:search IS NULL OR LOWER(e.name) LIKE :search " +
+           "OR LOWER(e.brand) LIKE :search " +
+           "OR LOWER(e.model) LIKE :search) AND " +
+           "(:categoryId IS NULL OR e.category.id = :categoryId) AND " +
+           "(:status IS NULL OR e.availabilityStatus = :status)",
+           countQuery = "SELECT COUNT(e) FROM Equipment e WHERE " +
            "(:search IS NULL OR LOWER(e.name) LIKE :search " +
            "OR LOWER(e.brand) LIKE :search " +
            "OR LOWER(e.model) LIKE :search) AND " +

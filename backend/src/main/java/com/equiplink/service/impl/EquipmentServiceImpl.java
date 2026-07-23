@@ -87,6 +87,10 @@ public class EquipmentServiceImpl implements EquipmentService {
                 .dailyRentalPrice(request.dailyRentalPrice())
                 .location(request.location())
                 .availabilityStatus(request.availabilityStatus())
+                .powerType(request.powerType() != null ? request.powerType() : com.equiplink.entity.enums.PowerType.DIESEL)
+                .batteryCapacityKwh(request.batteryCapacityKwh())
+                .chargingType(request.chargingType())
+                .evTermsAccepted(request.evTermsAccepted() != null ? request.evTermsAccepted() : false)
                 .owner(owner)
                 .category(category)
                 .build();
