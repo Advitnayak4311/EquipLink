@@ -45,6 +45,10 @@ export interface EquipmentSummary {
   dailyRentalPrice: number;
   location: string;
   availabilityStatus: EquipmentStatus;
+  powerType?: "DIESEL" | "ELECTRIC" | "HYBRID";
+  batteryCapacityKwh?: number;
+  chargingType?: string;
+  evTermsAccepted?: boolean;
   images: { id: number; imageUrl: string; displayOrder: number }[];
   ownerName: string;
   categoryName: string;

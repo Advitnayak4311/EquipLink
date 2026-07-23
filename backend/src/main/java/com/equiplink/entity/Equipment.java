@@ -54,6 +54,21 @@ public class Equipment extends BaseEntity {
     @Column(name = "availability_status", nullable = false)
     private EquipmentStatus availabilityStatus;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "power_type", nullable = false)
+    @Builder.Default
+    private com.equiplink.entity.enums.PowerType powerType = com.equiplink.entity.enums.PowerType.DIESEL;
+
+    @Column(name = "battery_capacity_kwh")
+    private Double batteryCapacityKwh;
+
+    @Column(name = "charging_type")
+    private String chargingType;
+
+    @Column(name = "ev_terms_accepted")
+    @Builder.Default
+    private Boolean evTermsAccepted = false;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "owner_id", referencedColumnName = "id", nullable = false)
     private User owner;

@@ -138,6 +138,8 @@ export interface EquipmentImage {
   displayOrder: number;
 }
 
+export type PowerType = "DIESEL" | "ELECTRIC" | "HYBRID";
+
 export interface Equipment {
   id: number;
   name: string;
@@ -148,6 +150,10 @@ export interface Equipment {
   dailyRentalPrice: number;
   location: string;
   availabilityStatus: EquipmentStatus;
+  powerType?: PowerType;
+  batteryCapacityKwh?: number;
+  chargingType?: string;
+  evTermsAccepted?: boolean;
   images: EquipmentImage[];
   owner: User;
   category: Category;

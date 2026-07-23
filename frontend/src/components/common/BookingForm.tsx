@@ -466,6 +466,17 @@ export default function BookingForm({
           {errors.geofenceAgreed && (
             <p className="text-[10px] text-destructive">{errors.geofenceAgreed.message}</p>
           )}
+
+          <label className="flex items-start space-x-2 cursor-pointer pt-1.5 border-t border-amber-500/20">
+            <input
+              type="checkbox"
+              defaultChecked
+              className="mt-0.5 rounded border-input text-amber-500 focus:ring-amber-500 h-4 w-4"
+            />
+            <span className="text-muted-foreground leading-tight">
+              <strong className="text-amber-500">⚡ EV & Fuel SLA Protocol:</strong> For Electric (EV) machines, Lessee agrees to return machine at ≥ 80% Battery State-of-Charge (SOC) and safeguard DC/AC chargers. For Diesel equipment, fuel tank return level must match initial dispatch protocol.
+            </span>
+          </label>
         </div>
       </div>
 

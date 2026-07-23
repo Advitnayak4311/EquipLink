@@ -1,6 +1,6 @@
 import { useState } from "react";
 import Link from "next/link";
-import { ShieldCheck, MapPin, Truck, ArrowRight } from "lucide-react";
+import { ShieldCheck, MapPin, Truck, ArrowRight, Zap, Fuel, Sparkles } from "lucide-react";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -23,7 +23,15 @@ export default function EquipmentCard({
 }: EquipmentCardProps) {
   const [imageError, setImageError] = useState(false);
 
-  // Use relative image path served from backend or fallback placeholder
+  // Determine power drive system (Electric vs Diesel vs Hybrid)
+  const isElectric =
+    equipment.powerType === "ELECTRIC" ||
+    equipment.name.toLowerCase().includes("electric") ||
+    equipment.description?.toLowerCase().includes("electric") ||
+    equipment.description?.toLowerCase().includes("ev ");
+
+  const isHybrid = equipment.powerType === "HYBRID" || equipment.name.toLowerCase().includes("hybrid");
+
   const imageUrl =
     equipment.images && equipment.images.length > 0
       ? resolveImageUrl(equipment.images[0].imageUrl)
@@ -52,6 +60,24 @@ export default function EquipmentCard({
             </span>
           </div>
         )}
+
+        {/* Top Floating Badges */}
+        <div className="absolute top-3 left-3 flex flex-col gap-1">
+          {isElectric ? (
+            <Badge className="bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-[10px] uppercase tracking-wider shadow-md">
+              <Zap className="w-3 h-3 mr-1 inline" /> 100% Zero-Emission EV
+            </Badge>
+          ) : isHybrid ? (
+            <Badge className="bg-purple-600 text-white font-bold text-[10px] uppercase tracking-wider shadow-md">
+              <Sparkles className="w-3 h-3 mr-1 inline" /> Hybrid Eco-Drive
+            </Badge>
+          ) : (
+            <Badge className="bg-slate-800/90 text-slate-200 border-slate-700 font-semibold text-[10px]">
+              <Fuel className="w-3 h-3 mr-1 inline text-amber-400" /> Diesel Drive
+            </Badge>
+          )}
+        </div>
+
         <div className="absolute top-3 right-3 shadow-md">
           <StatusBadge status={equipment.availabilityStatus} />
         </div>

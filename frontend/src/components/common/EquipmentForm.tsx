@@ -10,7 +10,7 @@ import { useCategories } from "@/lib/api/equipmentService";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Loader2, Sparkles, AlertTriangle, AlertCircle, CheckCircle, Info } from "lucide-react";
+import { Loader2, Sparkles, AlertTriangle, AlertCircle, CheckCircle, Info, Zap } from "lucide-react";
 import ImageUpload from "./ImageUpload";
 import { EquipmentStatus } from "@/types";
 import { useGenerateDescription, useAnalyzeListing, ListingAnalysisResponse } from "@/lib/api/aiService";
@@ -274,6 +274,7 @@ ${res.safetyNotes}`;
           <Label htmlFor="availabilityStatus">Availability Status</Label>
           <select
             id="availabilityStatus"
+            suppressHydrationWarning
             className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             {...register("availabilityStatus")}
           >
@@ -282,6 +283,65 @@ ${res.safetyNotes}`;
             <option value="MAINTENANCE">Maintenance</option>
             <option value="UNAVAILABLE">Unavailable</option>
           </select>
+        </div>
+      </div>
+
+      {/* Power Drive System & EV Specs */}
+      <div className="p-4 rounded-2xl bg-slate-900/60 border border-slate-800 space-y-4">
+        <div className="flex items-center justify-between">
+          <h4 className="text-sm font-bold text-slate-100 flex items-center">
+            <Zap className="w-4 h-4 text-amber-400 mr-2" /> Power Drive System & EV Charging Specs
+          </h4>
+          <span className="text-[11px] text-amber-400 font-bold uppercase tracking-wider">Electric & Diesel Protocol</span>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="space-y-1.5">
+            <Label htmlFor="powerType" className="text-xs text-slate-300">Fuel / Drive System</Label>
+            <select
+              id="powerType"
+              suppressHydrationWarning
+              className="flex h-10 w-full rounded-md border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-white"
+              {...register("powerType")}
+            >
+              <option value="DIESEL">⛽ Diesel Engine</option>
+              <option value="ELECTRIC">⚡ 100% Zero-Emission Electric (EV)</option>
+              <option value="HYBRID">🔋 Hybrid Diesel-Electric</option>
+            </select>
+          </div>
+
+          <div className="space-y-1.5">
+            <Label htmlFor="batteryCapacityKwh" className="text-xs text-slate-300">Battery Pack (kWh)</Label>
+            <Input
+              id="batteryCapacityKwh"
+              type="number"
+              placeholder="e.g. 200 (Leave blank for Diesel)"
+              className="bg-slate-950 border-slate-700 text-white"
+              {...register("batteryCapacityKwh", { valueAsNumber: true })}
+            />
+          </div>
+
+          <div className="space-y-1.5">
+            <Label htmlFor="chargingType" className="text-xs text-slate-300">Charging Interface</Label>
+            <Input
+              id="chargingType"
+              placeholder="e.g. CCS2 DC Fast / 415V AC"
+              className="bg-slate-950 border-slate-700 text-white"
+              {...register("chargingType")}
+            />
+          </div>
+        </div>
+
+        <div className="flex items-center space-x-2 pt-2 border-t border-slate-800">
+          <input
+            type="checkbox"
+            id="evTermsAccepted"
+            className="rounded border-slate-700 bg-slate-950 text-amber-500 focus:ring-amber-500 w-4 h-4 cursor-pointer"
+            {...register("evTermsAccepted")}
+          />
+          <Label htmlFor="evTermsAccepted" className="text-xs text-slate-300 cursor-pointer">
+            I confirm compliance with <strong>EquipLink EV Battery Health & State-of-Charge (80% SOC) Return SLA</strong> terms.
+          </Label>
         </div>
       </div>
 
