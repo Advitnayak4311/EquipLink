@@ -24,6 +24,7 @@ import {
   Layers,
   Truck,
   CheckCircle2,
+  RotateCcw,
 } from "lucide-react";
 import { toast } from "sonner";
 import { downloadEstimatePDF } from "@/lib/pdfGenerator";
@@ -34,6 +35,15 @@ export default function CalculatorPage() {
   const [excavators, setExcavators] = useState(2);
   const [cranes, setCranes] = useState(1);
   const [rollers, setRollers] = useState(2);
+
+  const handleReset = () => {
+    setProjectType("HIGHWAY");
+    setDurationDays(30);
+    setExcavators(0);
+    setCranes(0);
+    setRollers(0);
+    toast.info("All fleet parameters cleared.");
+  };
 
   // Calculations
   const dailyExcavatorRate = 9500;
@@ -103,13 +113,23 @@ export default function CalculatorPage() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Controls Form */}
           <Card className="lg:col-span-1 border shadow-sm h-fit">
-            <CardHeader>
-              <CardTitle className="text-xl font-bold flex items-center">
-                <Calculator className="w-5 h-5 mr-2 text-amber-500" /> Project Parameters
-              </CardTitle>
-              <CardDescription className="text-xs">
-                Adjust machinery counts and lease duration for instant calculation.
-              </CardDescription>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
+              <div>
+                <CardTitle className="text-xl font-bold flex items-center">
+                  <Calculator className="w-5 h-5 mr-2 text-amber-500" /> Project Parameters
+                </CardTitle>
+                <CardDescription className="text-xs mt-1">
+                  Adjust machinery counts and lease duration for instant calculation.
+                </CardDescription>
+              </div>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleReset}
+                className="text-xs font-bold border-amber-500/40 text-amber-600 hover:bg-amber-500 hover:text-slate-950 shrink-0"
+              >
+                <RotateCcw className="w-3.5 h-3.5 mr-1" /> Clear All
+              </Button>
             </CardHeader>
             <CardContent className="space-y-6">
               <div className="space-y-1.5">

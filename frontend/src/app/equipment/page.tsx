@@ -126,21 +126,31 @@ export default function EquipmentCatalogPage() {
               <h2 className="text-2xl font-bold tracking-tight">Machinery Categories & Specialties</h2>
               <p className="text-sm text-muted-foreground mt-1">Standardized heavy equipment specifications for construction & mining projects across India.</p>
             </div>
+            {selectedCategoryId && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setSelectedCategoryId("")}
+                className="text-xs font-bold border-amber-500/40 text-amber-500 hover:bg-amber-500 hover:text-slate-950"
+              >
+                Clear Selected Category Filter
+              </Button>
+            )}
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {categories && categories.length > 0 ? (
-              categories.slice(0, 8).map((cat) => (
+              categories.map((cat) => (
                 <Card
                   key={cat.id}
                   onClick={() => setSelectedCategoryId(cat.id === selectedCategoryId ? "" : cat.id)}
                   className={`border shadow-sm hover:shadow-md transition-all cursor-pointer ${
-                    selectedCategoryId === cat.id ? "ring-2 ring-primary border-primary bg-primary/5" : ""
+                    selectedCategoryId === cat.id ? "ring-2 ring-amber-500 border-amber-500 bg-amber-500/10" : ""
                   }`}
                 >
                   <CardHeader className="pb-3">
                     <div className="flex items-center justify-between">
-                      <div className="p-3 rounded-xl border bg-primary/10 text-primary border-primary/20">
+                      <div className="p-3 rounded-xl border bg-amber-500/10 text-amber-500 border-amber-500/20">
                         <Truck className="h-6 w-6" />
                       </div>
                       <Badge variant="outline" className="text-xs font-semibold">Verified Category</Badge>

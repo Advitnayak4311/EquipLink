@@ -22,12 +22,7 @@ public class CategoryDataLoader implements CommandLineRunner {
 
     @Override
     public void run(String... args) {
-        if (categoryRepository.count() > 0) {
-            log.info("Categories already seeded. Skipping initialization.");
-            return;
-        }
-
-        log.info("Seeding all heavy equipment fleet categories...");
+        log.info("Ensuring all heavy equipment fleet categories are seeded in database...");
 
         List<Category> categories = List.of(
             // ── Earthmoving & Excavation ──────────────────────────────────────────────
@@ -97,8 +92,14 @@ public class CategoryDataLoader implements CommandLineRunner {
             category("Marine Cranes",         "Offshore and harbor cranes for heavy lifting in port and marine environments.",               "marine-crane")
         );
 
-        categoryRepository.saveAll(categories);
-        log.info("Successfully seeded {} heavy equipment categories.", categories.size());
+        int addedCount = 0;
+        for (Category cat : categories) {
+            if (!categoryRepository.existsByName(cat.getName())) {
+                categoryRepository.save(cat);
+                addedCount++;
+            }
+        }
+        log.info("Successfully verified {} total heavy equipment categories (added {} new).", categories.size(), addedCount);
     }
 
     private Category category(String name, String description, String icon) {
