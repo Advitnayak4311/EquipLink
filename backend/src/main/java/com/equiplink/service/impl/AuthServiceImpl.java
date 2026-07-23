@@ -58,15 +58,16 @@ public class AuthServiceImpl implements AuthService {
             throw new IllegalArgumentException("Passwords do not match");
         }
 
-        if (userRepository.existsByEmail(request.email())) {
-            throw new EmailAlreadyExistsException(request.email());
+        String cleanEmail = request.email().trim().toLowerCase();
+        if (userRepository.existsByEmailIgnoreCase(cleanEmail)) {
+            throw new EmailAlreadyExistsException(cleanEmail);
         }
 
         String verificationToken = UUID.randomUUID().toString();
         User user = User.builder()
                 .firstName(request.firstName())
                 .lastName(request.lastName())
-                .email(request.email())
+                .email(cleanEmail)
                 .password(passwordEncoder.encode(request.password()))
                 .role(request.role())
                 .phone(request.phone())
@@ -93,11 +94,12 @@ public class AuthServiceImpl implements AuthService {
     @Override
     @Transactional
     public LoginResponse login(LoginRequest request) {
+        String cleanEmail = request.email().trim().toLowerCase();
         authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(request.email(), request.password())
+                new UsernamePasswordAuthenticationToken(cleanEmail, request.password())
         );
 
-        User user = userRepository.findByEmail(request.email())
+        User user = userRepository.findByEmailIgnoreCase(cleanEmail)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
         // Clean up old refresh tokens for this user

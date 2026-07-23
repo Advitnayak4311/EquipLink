@@ -54,11 +54,12 @@ public class EquipmentServiceImpl implements EquipmentService {
     @Override
     @Transactional
     public EquipmentResponse createEquipment(EquipmentCreateRequest request, String ownerEmail) {
-        User owner = userRepository.findByEmail(ownerEmail)
+        String cleanEmail = ownerEmail != null ? ownerEmail.trim().toLowerCase() : "";
+        User owner = userRepository.findByEmailIgnoreCase(cleanEmail)
                 .orElseGet(() -> {
-                    log.info("Auto-provisioning user record for {} upon listing creation.", ownerEmail);
+                    log.info("Auto-provisioning user record for {} upon listing creation.", cleanEmail);
                     User newUser = User.builder()
-                            .email(ownerEmail)
+                            .email(cleanEmail)
                             .firstName("Lessor")
                             .lastName("User")
                             .password(passwordEncoder.encode("localpassword"))
