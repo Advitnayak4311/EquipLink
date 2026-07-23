@@ -98,6 +98,11 @@ public class BookingServiceImpl implements BookingService {
                 .gstin(request.gstin() != null && !request.gstin().isBlank() ? request.gstin() : customer.getGstin())
                 .build();
 
+        booking.setVideoCallRoomId("equiplink-room-" + System.currentTimeMillis());
+        booking.setVerificationStatus(com.equiplink.entity.enums.VerificationStatus.UNVERIFIED);
+        booking.setEstimatedDistanceKm(42.5 + (equipment.getId() % 30));
+        booking.setMobilizationCost(booking.getEstimatedDistanceKm() * 120.0);
+
         bookingRepository.save(booking);
         log.info("Rental request submitted successfully for equipment {} by customer {}", equipment.getId(), customerEmail);
 
@@ -128,22 +133,21 @@ public class BookingServiceImpl implements BookingService {
         Specification<Booking> spec = (root, query, cb) -> {
             List<Predicate> predicates = new ArrayList<>();
 
-            // Filter by Owner Email
             predicates.add(cb.equal(root.get("equipment").get("owner").get("email"), ownerEmail));
 
-            // Optional Status Filter
             if (status != null) {
                 predicates.add(cb.equal(root.get("status"), status));
             }
 
-            // Optional Keyword Search (Equipment name or Customer name)
-            if (search != null && !search.trim().isEmpty()) {
-                String searchPattern = "%" + search.trim().toLowerCase() + "%";
-                predicates.add(cb.or(
+            if (search != null && !search.isBlank()) {
+                String searchPattern = "%" + search.toLowerCase() + "%";
+                Predicate searchPredicate = cb.or(
                         cb.like(cb.lower(root.get("equipment").get("name")), searchPattern),
                         cb.like(cb.lower(root.get("customer").get("firstName")), searchPattern),
-                        cb.like(cb.lower(root.get("customer").get("lastName")), searchPattern)
-                ));
+                        cb.like(cb.lower(root.get("customer").get("lastName")), searchPattern),
+                        cb.like(cb.lower(root.get("siteAddress")), searchPattern)
+                );
+                predicates.add(searchPredicate);
             }
 
             return cb.and(predicates.toArray(new Predicate[0]));
@@ -159,14 +163,13 @@ public class BookingServiceImpl implements BookingService {
         Booking booking = bookingRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Booking record not found"));
 
-        User user = userRepository.findByEmail(currentUserEmail)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+        boolean isCustomer = booking.getCustomer().getEmail().equals(currentUserEmail);
+        boolean isOwner = booking.getEquipment().getOwner().getEmail().equals(currentUserEmail);
+        boolean isAdmin = userRepository.findByEmail(currentUserEmail)
+                .map(u -> u.getRole() == UserRole.ADMIN).orElse(false);
 
-        // Admin can read all. Customers can read their own. Owners can read incoming.
-        if (user.getRole() != UserRole.ADMIN &&
-                !booking.getCustomer().getEmail().equals(currentUserEmail) &&
-                !booking.getEquipment().getOwner().getEmail().equals(currentUserEmail)) {
-            throw new AccessDeniedException("You are not authorized to view this booking record");
+        if (!isCustomer && !isOwner && !isAdmin) {
+            throw new AccessDeniedException("You do not have permission to view details for this booking");
         }
 
         return bookingMapper.toResponse(booking);
@@ -257,5 +260,41 @@ public class BookingServiceImpl implements BookingService {
         }
 
         return bookingMapper.toResponse(booking);
+    }
+
+    @Override
+    @Transactional
+    public BookingSummaryResponse verifyVideoInspection(Long id, String currentUserEmail) {
+        Booking booking = bookingRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Booking record not found"));
+
+        booking.setVideoVerifiedAt(java.time.LocalDateTime.now());
+        if (booking.getVerificationStatus() == com.equiplink.entity.enums.VerificationStatus.DOCUMENTS_VERIFIED) {
+            booking.setVerificationStatus(com.equiplink.entity.enums.VerificationStatus.FULLY_VERIFIED);
+        } else {
+            booking.setVerificationStatus(com.equiplink.entity.enums.VerificationStatus.VIDEO_VERIFIED);
+        }
+
+        bookingRepository.save(booking);
+        log.info("Booking {} live video verified by {}", id, currentUserEmail);
+        return bookingMapper.toSummaryResponse(booking);
+    }
+
+    @Override
+    @Transactional
+    public BookingSummaryResponse verifyDocuments(Long id, String currentUserEmail) {
+        Booking booking = bookingRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Booking record not found"));
+
+        booking.setDocumentsVerifiedAt(java.time.LocalDateTime.now());
+        if (booking.getVerificationStatus() == com.equiplink.entity.enums.VerificationStatus.VIDEO_VERIFIED) {
+            booking.setVerificationStatus(com.equiplink.entity.enums.VerificationStatus.FULLY_VERIFIED);
+        } else {
+            booking.setVerificationStatus(com.equiplink.entity.enums.VerificationStatus.DOCUMENTS_VERIFIED);
+        }
+
+        bookingRepository.save(booking);
+        log.info("Booking {} machinery documents verified by {}", id, currentUserEmail);
+        return bookingMapper.toSummaryResponse(booking);
     }
 }

@@ -70,6 +70,7 @@ export default function FilterSidebar({
         ) : (
           <select
             id="category"
+            suppressHydrationWarning
             value={category}
             onChange={(e) => setCategory(e.target.value ? Number(e.target.value) : "")}
             className="flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-xs ring-offset-background"

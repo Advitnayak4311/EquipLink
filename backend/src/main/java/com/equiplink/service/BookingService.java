@@ -26,4 +26,8 @@ public interface BookingService {
     BookingResponse rejectBooking(Long id, String ownerEmail);
 
     BookingResponse cancelBooking(Long id, String customerEmail);
+
+    BookingSummaryResponse verifyVideoInspection(Long id, String currentUserEmail);
+
+    BookingSummaryResponse verifyDocuments(Long id, String currentUserEmail);
 }

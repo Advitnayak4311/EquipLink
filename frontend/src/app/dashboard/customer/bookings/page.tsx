@@ -1,21 +1,29 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { toast } from "sonner";
-import { Calendar, Truck, ArrowLeft, ArrowRight } from "lucide-react";
+import { Calendar, Truck, ArrowLeft, ArrowRight, Video, FileCheck, ShieldCheck } from "lucide-react";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import Sidebar from "@/components/layout/Sidebar";
 import Breadcrumb from "@/components/common/Breadcrumb";
 import BookingStatusBadge from "@/components/common/BookingStatusBadge";
+import LocationThreeWayBadge from "@/components/common/LocationThreeWayBadge";
+import LiveVideoVerificationModal from "@/components/common/LiveVideoVerificationModal";
+import LiveDocumentVerificationModal from "@/components/common/LiveDocumentVerificationModal";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { useMyBookings, useCancelBooking } from "@/lib/api/bookingService";
+import { Badge } from "@/components/ui/badge";
+import { useMyBookings, useCancelBooking, useVerifyVideo, useVerifyDocuments, BookingSummaryResponse } from "@/lib/api/bookingService";
 import Loader from "@/components/common/Loader";
 import { resolveImageUrl } from "@/lib/utils";
 
 export default function CustomerBookingsPage() {
   const [page, setPage] = useState(0);
+  const [videoModalOpen, setVideoModalOpen] = useState(false);
+  const [docModalOpen, setDocModalOpen] = useState(false);
+  const [selectedBooking, setSelectedBooking] = useState<BookingSummaryResponse | null>(null);
 
   const { data: pageData, isLoading, refetch } = useMyBookings({
     page,
@@ -23,6 +31,8 @@ export default function CustomerBookingsPage() {
   });
 
   const cancelMutation = useCancelBooking();
+  const verifyVideoMutation = useVerifyVideo();
+  const verifyDocMutation = useVerifyDocuments();
 
   const handleCancel = async (id: number) => {
     const confirmCancel = window.confirm("Are you sure you want to cancel this booking request?");
@@ -37,12 +47,38 @@ export default function CustomerBookingsPage() {
     }
   };
 
-  const handlePageChange = (newPage: number) => {
-    setPage(newPage);
+  const openVideoInspection = (booking: BookingSummaryResponse) => {
+    setSelectedBooking(booking);
+    setVideoModalOpen(true);
+  };
+
+  const openDocInspection = (booking: BookingSummaryResponse) => {
+    setSelectedBooking(booking);
+    setDocModalOpen(true);
+  };
+
+  const handleVerifyVideoSuccess = async () => {
+    if (!selectedBooking) return;
+    try {
+      await verifyVideoMutation.mutateAsync(selectedBooking.id);
+      refetch();
+    } catch {
+      // Ignored
+    }
+  };
+
+  const handleVerifyDocSuccess = async () => {
+    if (!selectedBooking) return;
+    try {
+      await verifyDocMutation.mutateAsync(selectedBooking.id);
+      refetch();
+    } catch {
+      // Ignored
+    }
   };
 
   return (
-    <div className="flex flex-col min-h-screen bg-background">
+    <div className="flex flex-col min-h-screen bg-background font-sans">
       <Navbar />
       <div className="flex-1 flex">
         <Sidebar className="hidden md:flex" />
@@ -51,9 +87,9 @@ export default function CustomerBookingsPage() {
 
           {/* Heading */}
           <div className="mb-6 mt-2">
-            <h1 className="text-3xl font-bold tracking-tight">My Rental Requests</h1>
+            <h1 className="text-3xl font-extrabold tracking-tight font-heading">My Rental Requests & Verifications</h1>
             <p className="text-muted-foreground text-sm">
-              Track and manage machinery rental requests submitted to fleet owners.
+              Track 3-way jobsite locations, join live video machinery inspections, and verify owner compliance documents.
             </p>
           </div>
 
@@ -84,17 +120,17 @@ export default function CustomerBookingsPage() {
               </Button>
             </div>
           ) : (
-            <div className="space-y-4">
+            <div className="space-y-6">
               {pageData?.content.map((booking) => {
                 const imageUrl = resolveImageUrl(booking.equipmentImageUrl);
 
                 return (
                   <Card key={booking.id} className="border overflow-hidden bg-card shadow-sm hover:shadow-md transition-shadow">
-                    <CardContent className="p-5">
+                    <CardContent className="p-5 space-y-4">
                       <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
                         {/* Equipment cover & details */}
                         <div className="flex items-start space-x-4">
-                          <div className="w-24 aspect-video bg-muted flex items-center justify-center rounded-lg overflow-hidden shrink-0 relative">
+                          <div className="w-24 aspect-video bg-slate-900 flex items-center justify-center rounded-lg overflow-hidden shrink-0 relative">
                             {imageUrl ? (
                               // eslint-disable-next-line @next/next/no-img-element
                               <img
@@ -107,30 +143,31 @@ export default function CustomerBookingsPage() {
                                 className="object-cover w-full h-full relative z-10"
                               />
                             ) : null}
-                            <Truck className="h-8 w-8 text-muted-foreground/60 absolute" />
+                            <Truck className="h-8 w-8 text-amber-500/80 absolute" />
                           </div>
                           <div className="space-y-1">
-                            <h3 className="font-bold text-base leading-snug">
-                              <Link href={`/equipment/${booking.equipmentId}`} className="hover:text-primary transition-colors">
+                            <h3 className="font-extrabold text-base leading-snug font-heading">
+                              <Link href={`/equipment/${booking.equipmentId}`} className="hover:text-amber-500 transition-colors">
                                 {booking.equipmentName}
                               </Link>
                             </h3>
                             <p className="text-xs text-muted-foreground">Lessor Email: {booking.customerEmail}</p>
                             <p className="text-xs text-foreground font-semibold flex items-center pt-1">
-                              <Calendar className="mr-1 h-3.5 w-3.5 text-primary" />
+                              <Calendar className="mr-1 h-3.5 w-3.5 text-amber-500" />
                               {booking.startDate} to {booking.endDate}
                             </p>
                           </div>
                         </div>
 
-                        {/* Status badge & cancel button */}
+                        {/* Status & Action Buttons */}
                         <div className="flex sm:flex-col items-start sm:items-end justify-between sm:justify-start gap-3">
                           <BookingStatusBadge status={booking.status} />
                           {booking.status === "PENDING" && (
                             <Button
-                              size="xs"
+                              size="sm"
                               variant="destructive"
                               onClick={() => handleCancel(booking.id)}
+                              className="text-xs font-bold"
                             >
                               Cancel Request
                             </Button>
@@ -138,20 +175,74 @@ export default function CustomerBookingsPage() {
                         </div>
                       </div>
 
-                      {/* Optional message to owner */}
-                      {booking.message && (
-                        <div className="mt-4 p-3 bg-muted/30 border rounded-lg text-xs text-muted-foreground">
-                          <p className="font-semibold text-[10px] uppercase text-muted-foreground/80 mb-1">
-                            Your Message to Owner:
-                          </p>
-                          {booking.message}
+                      {/* 3-Way Jobsite Location Engine */}
+                      <LocationThreeWayBadge
+                        machineLocation={booking.machineLocation || "Owner Machinery Yard"}
+                        customerLocation={booking.customerLocation || "Lessee Corporate HQ"}
+                        siteAddress={booking.siteAddress || "Target Jobsite Address"}
+                        estimatedDistanceKm={booking.estimatedDistanceKm || 48}
+                        mobilizationCost={booking.mobilizationCost || 5760}
+                      />
+
+                      {/* Live Video & Document Verification Suite Controls */}
+                      <div className="p-3.5 rounded-xl bg-slate-900/40 border border-slate-800 flex flex-wrap items-center justify-between gap-3 text-xs">
+                        <div className="flex items-center space-x-2">
+                          <Badge variant="outline" className="border-amber-500/40 text-amber-400 font-bold bg-amber-950/40 text-[10px]">
+                            <ShieldCheck className="w-3 h-3 mr-1 inline" />
+                            Status: {booking.verificationStatus || "UNVERIFIED"}
+                          </Badge>
+                          <span className="text-[11px] text-muted-foreground hidden sm:inline">
+                            Perform live video inspection or verify legal RTO certificates.
+                          </span>
                         </div>
-                      )}
+
+                        <div className="flex items-center space-x-2">
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => openVideoInspection(booking)}
+                            className="text-xs font-bold border-amber-500/40 bg-amber-500/10 text-amber-400 hover:bg-amber-500 hover:text-slate-950"
+                          >
+                            <Video className="w-3.5 h-3.5 mr-1.5" /> Live Video Inspection
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => openDocInspection(booking)}
+                            className="text-xs font-bold border-emerald-500/40 bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500 hover:text-slate-950"
+                          >
+                            <FileCheck className="w-3.5 h-3.5 mr-1.5" /> Inspect RC & License
+                          </Button>
+                        </div>
+                      </div>
                     </CardContent>
                   </Card>
                 );
               })}
             </div>
+          )}
+
+          {/* Modals */}
+          {selectedBooking && (
+            <>
+              <LiveVideoVerificationModal
+                open={videoModalOpen}
+                onOpenChange={setVideoModalOpen}
+                bookingId={selectedBooking.id}
+                equipmentName={selectedBooking.equipmentName}
+                videoCallRoomId={selectedBooking.videoCallRoomId}
+                isVerified={selectedBooking.verificationStatus === "VIDEO_VERIFIED" || selectedBooking.verificationStatus === "FULLY_VERIFIED"}
+                onVerifySuccess={handleVerifyVideoSuccess}
+              />
+              <LiveDocumentVerificationModal
+                open={docModalOpen}
+                onOpenChange={setDocModalOpen}
+                bookingId={selectedBooking.id}
+                equipmentName={selectedBooking.equipmentName}
+                isVerified={selectedBooking.verificationStatus === "DOCUMENTS_VERIFIED" || selectedBooking.verificationStatus === "FULLY_VERIFIED"}
+                onVerifySuccess={handleVerifyDocSuccess}
+              />
+            </>
           )}
 
           {/* Pagination Controls */}
@@ -164,18 +255,18 @@ export default function CustomerBookingsPage() {
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={() => handlePageChange(page - 1)}
+                  onClick={() => setPage(page - 1)}
                   disabled={pageData.first}
-                  className="text-xs"
+                  className="text-xs font-bold"
                 >
                   <ArrowLeft className="mr-1 h-4 w-4" /> Previous
                 </Button>
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={() => handlePageChange(page + 1)}
+                  onClick={() => setPage(page + 1)}
                   disabled={pageData.last}
-                  className="text-xs"
+                  className="text-xs font-bold"
                 >
                   Next <ArrowRight className="ml-1 h-4 w-4" />
                 </Button>

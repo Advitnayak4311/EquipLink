@@ -16,16 +16,33 @@ export interface BookingRequest {
   gstin?: string;
 }
 
+export type VerificationStatus =
+  | "UNVERIFIED"
+  | "VIDEO_SCHEDULED"
+  | "VIDEO_VERIFIED"
+  | "DOCUMENTS_VERIFIED"
+  | "FULLY_VERIFIED";
+
 export interface BookingSummaryResponse {
   id: number;
   equipmentId: number;
   equipmentName: string;
   equipmentImageUrl: string;
+  machineLocation?: string;
   customerName: string;
   customerEmail: string;
+  customerLocation?: string;
   startDate: string;
   endDate: string;
   status: BookingStatus;
+  verificationStatus?: VerificationStatus;
+  videoCallRoomId?: string;
+  rcDocumentUrl?: string;
+  insuranceDocumentUrl?: string;
+  fitnessCertificateUrl?: string;
+  operatorLicenseUrl?: string;
+  estimatedDistanceKm?: number;
+  mobilizationCost?: number;
   message: string;
   siteAddress?: string;
   workPurpose?: string;
@@ -56,6 +73,8 @@ export interface BookingResponse {
   startDate: string;
   endDate: string;
   status: BookingStatus;
+  verificationStatus?: VerificationStatus;
+  videoCallRoomId?: string;
   message: string;
   siteAddress?: string;
   workPurpose?: string;
@@ -112,6 +131,16 @@ export const bookingApi = {
 
   cancel: async (id: number): Promise<BookingResponse> => {
     const response = await apiClient.put<BaseResponse<BookingResponse>>(`/bookings/${id}/cancel`);
+    return response.data.data;
+  },
+
+  verifyVideo: async (id: number): Promise<BookingSummaryResponse> => {
+    const response = await apiClient.post<BaseResponse<BookingSummaryResponse>>(`/bookings/${id}/verify-video`);
+    return response.data.data;
+  },
+
+  verifyDocuments: async (id: number): Promise<BookingSummaryResponse> => {
+    const response = await apiClient.post<BaseResponse<BookingSummaryResponse>>(`/bookings/${id}/verify-documents`);
     return response.data.data;
   },
 };
@@ -173,6 +202,28 @@ export function useCancelBooking() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: bookingApi.cancel,
+    onSuccess: (data, id) => {
+      queryClient.invalidateQueries({ queryKey: ["bookings"] });
+      queryClient.invalidateQueries({ queryKey: ["bookings", id] });
+    },
+  });
+}
+
+export function useVerifyVideo() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: bookingApi.verifyVideo,
+    onSuccess: (data, id) => {
+      queryClient.invalidateQueries({ queryKey: ["bookings"] });
+      queryClient.invalidateQueries({ queryKey: ["bookings", id] });
+    },
+  });
+}
+
+export function useVerifyDocuments() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: bookingApi.verifyDocuments,
     onSuccess: (data, id) => {
       queryClient.invalidateQueries({ queryKey: ["bookings"] });
       queryClient.invalidateQueries({ queryKey: ["bookings", id] });

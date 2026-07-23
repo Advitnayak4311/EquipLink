@@ -26,6 +26,7 @@ import {
   CheckCircle2,
 } from "lucide-react";
 import { toast } from "sonner";
+import { downloadEstimatePDF } from "@/lib/pdfGenerator";
 
 export default function CalculatorPage() {
   const [projectType, setProjectType] = useState("HIGHWAY");
@@ -61,7 +62,20 @@ export default function CalculatorPage() {
   const estimatedCO2Tons = Number(((totalFuelLiters * 2.68) / 1000).toFixed(1));
 
   const handleExportEstimate = () => {
-    toast.success("AI Cost Estimate PDF summary generated & downloaded!");
+    downloadEstimatePDF({
+      projectType,
+      durationDays,
+      excavators,
+      cranes,
+      rollers,
+      dailyEquipmentCost,
+      totalEquipmentCost,
+      totalFuelLiters,
+      totalFuelCost,
+      recommendedOperators,
+      estimatedCO2Tons,
+    });
+    toast.success("AI Cost Estimate PDF generated & opened for print/download!");
   };
 
   return (
@@ -104,6 +118,7 @@ export default function CalculatorPage() {
                 </Label>
                 <select
                   id="projectType"
+                  suppressHydrationWarning
                   value={projectType}
                   onChange={(e) => setProjectType(e.target.value)}
                   className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus-visible:outline-none"

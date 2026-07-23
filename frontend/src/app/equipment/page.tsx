@@ -103,13 +103,13 @@ export default function EquipmentCatalogPage() {
                 </Link>
               </Button>
               {user?.role === "OWNER" ? (
-                <Button asChild variant="outline" size="lg" className="border-slate-700 text-white hover:bg-slate-800 font-semibold">
+                <Button asChild size="lg" className="bg-slate-800 hover:bg-slate-700 text-white font-bold border border-slate-600 shadow-md">
                   <Link href="/dashboard/owner/equipment">
                     <Truck className="mr-2 h-5 w-5" /> Manage My Listed Fleet
                   </Link>
                 </Button>
               ) : (
-                <Button asChild variant="outline" size="lg" className="border-amber-500/40 text-amber-400 hover:bg-amber-500/10 font-semibold">
+                <Button asChild size="lg" className="bg-slate-800 hover:bg-slate-700 text-amber-400 font-bold border border-amber-500/40 shadow-md">
                   <Link href="/register?role=OWNER">
                     <Plus className="mr-2 h-5 w-5" /> List Equipment & Earn
                   </Link>

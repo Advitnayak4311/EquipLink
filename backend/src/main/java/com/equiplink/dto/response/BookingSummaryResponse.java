@@ -1,6 +1,7 @@
 package com.equiplink.dto.response;
 
 import com.equiplink.entity.enums.BookingStatus;
+import com.equiplink.entity.enums.VerificationStatus;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -13,11 +14,21 @@ public record BookingSummaryResponse(
         Long equipmentId,
         String equipmentName,
         String equipmentImageUrl,
+        String machineLocation,
         String customerName,
         String customerEmail,
+        String customerLocation,
         LocalDate startDate,
         LocalDate endDate,
         BookingStatus status,
+        VerificationStatus verificationStatus,
+        String videoCallRoomId,
+        String rcDocumentUrl,
+        String insuranceDocumentUrl,
+        String fitnessCertificateUrl,
+        String operatorLicenseUrl,
+        Double estimatedDistanceKm,
+        Double mobilizationCost,
         String message,
         String siteAddress,
         String workPurpose,

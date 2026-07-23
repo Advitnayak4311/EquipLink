@@ -68,56 +68,169 @@ export function Navbar() {
       .toUpperCase()
       .slice(0, 2);
 
-  const NavLinks = () => (
-    <>
-      <Link
-        href="/marketplace"
-        className="text-sm font-semibold text-muted-foreground hover:text-foreground transition-colors"
-        onClick={() => setMobileOpen(false)}
-      >
-        Marketplace
-      </Link>
-      <Link
-        href="/equipment"
-        className="text-sm font-semibold text-muted-foreground hover:text-foreground transition-colors"
-        onClick={() => setMobileOpen(false)}
-      >
-        Fleet Catalog
-      </Link>
-      <Link
-        href="/calculator"
-        className="text-sm font-semibold text-muted-foreground hover:text-foreground transition-colors flex items-center"
-        onClick={() => setMobileOpen(false)}
-      >
-        AI Estimator
-      </Link>
-      <Link
-        href="/telematics"
-        className="text-sm font-semibold text-muted-foreground hover:text-foreground transition-colors flex items-center"
-        onClick={() => setMobileOpen(false)}
-      >
-        Telematics
-      </Link>
-      <Link
-        href="/company"
-        className="text-sm font-semibold text-muted-foreground hover:text-foreground transition-colors"
-        onClick={() => setMobileOpen(false)}
-      >
-        Company & ESG
-      </Link>
-    </>
-  );
+  const NavLinks = () => {
+    if (isAuthenticated && user?.role === "OWNER") {
+      return (
+        <>
+          <Link
+            href="/dashboard/owner"
+            className="text-sm font-extrabold text-muted-foreground hover:text-amber-500 transition-colors font-heading"
+            onClick={() => setMobileOpen(false)}
+          >
+            Fleet Manager
+          </Link>
+          <Link
+            href="/dashboard/owner/bookings"
+            className="text-sm font-extrabold text-muted-foreground hover:text-amber-500 transition-colors font-heading"
+            onClick={() => setMobileOpen(false)}
+          >
+            Rental Requests & Verification
+          </Link>
+          <Link
+            href="/dashboard/owner/equipment/new"
+            className="text-sm font-extrabold text-muted-foreground hover:text-amber-500 transition-colors font-heading"
+            onClick={() => setMobileOpen(false)}
+          >
+            + Add Machinery
+          </Link>
+          <Link
+            href="/telematics"
+            className="text-sm font-extrabold text-muted-foreground hover:text-amber-500 transition-colors font-heading"
+            onClick={() => setMobileOpen(false)}
+          >
+            Telematics GPS
+          </Link>
+          <Link
+            href="/calculator"
+            className="text-sm font-extrabold text-muted-foreground hover:text-amber-500 transition-colors font-heading"
+            onClick={() => setMobileOpen(false)}
+          >
+            AI Estimator
+          </Link>
+        </>
+      );
+    }
+
+    if (isAuthenticated && user?.role === "CUSTOMER") {
+      return (
+        <>
+          <Link
+            href="/marketplace"
+            className="text-sm font-extrabold text-muted-foreground hover:text-emerald-500 transition-colors font-heading"
+            onClick={() => setMobileOpen(false)}
+          >
+            Find Machinery
+          </Link>
+          <Link
+            href="/dashboard/customer/bookings"
+            className="text-sm font-extrabold text-muted-foreground hover:text-emerald-500 transition-colors font-heading"
+            onClick={() => setMobileOpen(false)}
+          >
+            My Rental Requests
+          </Link>
+          <Link
+            href="/calculator"
+            className="text-sm font-extrabold text-muted-foreground hover:text-emerald-500 transition-colors font-heading"
+            onClick={() => setMobileOpen(false)}
+          >
+            AI Cost Estimator
+          </Link>
+          <Link
+            href="/wishlist"
+            className="text-sm font-extrabold text-muted-foreground hover:text-emerald-500 transition-colors font-heading"
+            onClick={() => setMobileOpen(false)}
+          >
+            Saved Wishlist
+          </Link>
+          <Link
+            href="/telematics"
+            className="text-sm font-extrabold text-muted-foreground hover:text-emerald-500 transition-colors font-heading"
+            onClick={() => setMobileOpen(false)}
+          >
+            Telematics GPS
+          </Link>
+        </>
+      );
+    }
+
+    return (
+      <>
+        <Link
+          href="/marketplace"
+          className="text-sm font-semibold text-muted-foreground hover:text-foreground transition-colors"
+          onClick={() => setMobileOpen(false)}
+        >
+          Marketplace
+        </Link>
+        <Link
+          href="/equipment"
+          className="text-sm font-semibold text-muted-foreground hover:text-foreground transition-colors"
+          onClick={() => setMobileOpen(false)}
+        >
+          Fleet Catalog
+        </Link>
+        <Link
+          href="/calculator"
+          className="text-sm font-semibold text-muted-foreground hover:text-foreground transition-colors flex items-center"
+          onClick={() => setMobileOpen(false)}
+        >
+          AI Estimator
+        </Link>
+        <Link
+          href="/telematics"
+          className="text-sm font-semibold text-muted-foreground hover:text-foreground transition-colors flex items-center"
+          onClick={() => setMobileOpen(false)}
+        >
+          Telematics
+        </Link>
+        <Link
+          href="/company"
+          className="text-sm font-semibold text-muted-foreground hover:text-foreground transition-colors"
+          onClick={() => setMobileOpen(false)}
+        >
+          Company & ESG
+        </Link>
+      </>
+    );
+  };
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+    <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80 font-sans shadow-sm">
+      {/* Top Enterprise Ticker Bar */}
+      <div className="hidden sm:block bg-slate-950 text-slate-300 text-[11px] py-1.5 border-b border-slate-800">
+        <div className="container mx-auto px-4 max-w-7xl flex items-center justify-between">
+          <div className="flex items-center space-x-3">
+            <span className="bg-amber-500/20 text-amber-400 font-bold px-1.5 py-0.5 rounded text-[10px] uppercase">
+              Notice
+            </span>
+            <span>
+              {user?.role === "OWNER"
+                ? "🚜 Owner Command Center • Manage Fleet & Verification Requests"
+                : user?.role === "CUSTOMER"
+                ? "🏗️ Lessee Customer Portal • Track 3-Way Jobsite Mobilization & Inspections"
+                : "🚜 Digitized Heavy Machinery Marketplace & T3 Telematics Network"}
+            </span>
+          </div>
+          <div className="flex items-center space-x-4 text-slate-400">
+            <Link href="/company" className="hover:text-amber-400 transition-colors font-medium">
+              Enterprise Network
+            </Link>
+            <span>•</span>
+            <Link href="/contact" className="hover:text-amber-400 transition-colors font-medium">
+              Corporate Support: +91 1800-345-8899
+            </Link>
+          </div>
+        </div>
+      </div>
+
       <div className="container mx-auto flex h-16 items-center justify-between px-4">
         {/* Logo */}
-        <Link href="/" className="flex items-center gap-2 font-bold text-xl">
-          <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-primary text-primary-foreground">
-            <Truck className="w-4 h-4" />
+        <Link href="/" className="flex items-center gap-2.5 font-black text-xl tracking-tight font-heading">
+          <div className="flex items-center justify-center w-9 h-9 rounded-xl bg-amber-500 text-slate-950 shadow-md shadow-amber-500/20">
+            <Truck className="w-5 h-5" />
           </div>
-          <span>
-            Equip<span className="text-primary">Link</span>
+          <span className="font-extrabold text-foreground">
+            Equip<span className="text-amber-500">Link</span>
           </span>
         </Link>
 
@@ -129,91 +242,114 @@ export function Navbar() {
         {/* Desktop Auth */}
         <div className="hidden md:flex items-center gap-3">
           {isAuthenticated && user ? (
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="flex items-center gap-2 h-9 px-2">
-                  <Avatar className="h-7 w-7">
-                    <AvatarImage src={undefined} alt={displayName} />
-                    <AvatarFallback className="text-xs bg-primary text-primary-foreground">
-                      {getInitials(displayName)}
-                    </AvatarFallback>
-                  </Avatar>
-                  <span className="text-sm font-medium max-w-[120px] truncate">
-                    {displayName}
-                  </span>
-                  <Badge variant={getRoleBadgeColor()} className="text-xs px-1.5 py-0">
-                    {user.role}
-                  </Badge>
-                  <ChevronDown className="w-3 h-3 text-muted-foreground" />
+            <div className="flex items-center space-x-3">
+              {user.role === "OWNER" && (
+                <Button size="sm" asChild className="bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs">
+                  <Link href="/dashboard/owner/equipment/new">+ List New Machine</Link>
                 </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-56">
-                <DropdownMenuLabel className="font-normal">
-                  <div className="flex flex-col space-y-1">
-                    <p className="text-sm font-medium">{displayName}</p>
-                    <p className="text-xs text-muted-foreground">{user.email}</p>
-                  </div>
-                </DropdownMenuLabel>
-                <DropdownMenuSeparator />
+              )}
+              {user.role === "CUSTOMER" && (
+                <Button size="sm" asChild className="bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs">
+                  <Link href="/marketplace">Browse Marketplace</Link>
+                </Button>
+              )}
 
-                <DropdownMenuItem asChild>
-                  <Link href={getDashboardHref()} className="cursor-pointer">
-                    {user.role === "ADMIN" ? (
-                      <Shield className="mr-2 h-4 w-4" />
-                    ) : (
-                      <LayoutDashboard className="mr-2 h-4 w-4" />
-                    )}
-                    Dashboard
-                  </Link>
-                </DropdownMenuItem>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" className="flex items-center gap-2 h-9 px-2">
+                    <Avatar className="h-7 w-7">
+                      <AvatarImage src={undefined} alt={displayName} />
+                      <AvatarFallback className="text-xs bg-amber-500 text-slate-950 font-bold">
+                        {getInitials(displayName)}
+                      </AvatarFallback>
+                    </Avatar>
+                    <span className="text-sm font-medium max-w-[120px] truncate">
+                      {displayName}
+                    </span>
+                    <Badge variant={getRoleBadgeColor()} className="text-xs px-1.5 py-0 font-bold">
+                      {user.role}
+                    </Badge>
+                    <ChevronDown className="w-3 h-3 text-muted-foreground" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-56">
+                  <DropdownMenuLabel className="font-normal">
+                    <div className="flex flex-col space-y-1">
+                      <p className="text-sm font-medium">{displayName}</p>
+                      <p className="text-xs text-muted-foreground">{user.email}</p>
+                    </div>
+                  </DropdownMenuLabel>
+                  <DropdownMenuSeparator />
 
-                {user.role === "CUSTOMER" && (
-                  <>
-                    <DropdownMenuItem asChild>
-                      <Link href="/bookings" className="cursor-pointer">
-                        <CalendarCheck className="mr-2 h-4 w-4" />
-                        My Bookings
-                      </Link>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem asChild>
-                      <Link href="/wishlist" className="cursor-pointer">
-                        <Heart className="mr-2 h-4 w-4" />
-                        Wishlist
-                      </Link>
-                    </DropdownMenuItem>
-                  </>
-                )}
+                  <DropdownMenuItem asChild>
+                    <Link href={getDashboardHref()} className="cursor-pointer font-bold">
+                      {user.role === "ADMIN" ? (
+                        <Shield className="mr-2 h-4 w-4" />
+                      ) : (
+                        <LayoutDashboard className="mr-2 h-4 w-4 text-amber-500" />
+                      )}
+                      {user.role === "OWNER" ? "Fleet Command Center" : "Customer Portal"}
+                    </Link>
+                  </DropdownMenuItem>
 
-                <DropdownMenuItem asChild>
-                  <Link href="/profile" className="cursor-pointer">
-                    <User className="mr-2 h-4 w-4" />
-                    Profile
-                  </Link>
-                </DropdownMenuItem>
+                  {user.role === "CUSTOMER" && (
+                    <>
+                      <DropdownMenuItem asChild>
+                        <Link href="/dashboard/customer/bookings" className="cursor-pointer">
+                          <CalendarCheck className="mr-2 h-4 w-4" />
+                          My Rental Requests
+                        </Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem asChild>
+                        <Link href="/wishlist" className="cursor-pointer">
+                          <Heart className="mr-2 h-4 w-4 text-rose-500" />
+                          Wishlist
+                        </Link>
+                      </DropdownMenuItem>
+                    </>
+                  )}
 
-                <DropdownMenuItem asChild>
-                  <Link href="/settings" className="cursor-pointer">
-                    <User className="mr-2 h-4 w-4" />
-                    Settings
-                  </Link>
-                </DropdownMenuItem>
+                  {user.role === "OWNER" && (
+                    <>
+                      <DropdownMenuItem asChild>
+                        <Link href="/dashboard/owner/bookings" className="cursor-pointer">
+                          <CalendarCheck className="mr-2 h-4 w-4" />
+                          Incoming Requests
+                        </Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem asChild>
+                        <Link href="/dashboard/owner/equipment/new" className="cursor-pointer">
+                          <Truck className="mr-2 h-4 w-4 text-amber-500" />
+                          List New Equipment
+                        </Link>
+                      </DropdownMenuItem>
+                    </>
+                  )}
 
-                <DropdownMenuSeparator />
-                <DropdownMenuItem
-                  onClick={handleLogout}
-                  className="text-destructive focus:text-destructive cursor-pointer"
-                >
-                  <LogOut className="mr-2 h-4 w-4" />
-                  Log out
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+                  <DropdownMenuItem asChild>
+                    <Link href="/profile" className="cursor-pointer">
+                      <User className="mr-2 h-4 w-4" />
+                      Profile
+                    </Link>
+                  </DropdownMenuItem>
+
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem
+                    onClick={handleLogout}
+                    className="text-destructive focus:text-destructive cursor-pointer"
+                  >
+                    <LogOut className="mr-2 h-4 w-4" />
+                    Log out
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
           ) : (
             <>
               <Button variant="ghost" size="sm" asChild>
                 <Link href="/login">Sign In</Link>
               </Button>
-              <Button size="sm" asChild>
+              <Button size="sm" asChild className="bg-amber-500 text-slate-950 font-bold hover:bg-amber-400">
                 <Link href="/register">Get Started</Link>
               </Button>
             </>

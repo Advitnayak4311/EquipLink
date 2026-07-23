@@ -59,7 +59,10 @@ function LoginForm() {
     } catch (err) {
       const axiosError = err as AxiosError<ApiError>;
       const message =
-        axiosError.response?.data?.message || "Login failed. Please check your credentials.";
+        axiosError.response?.data?.message ||
+        (axiosError.code === "ERR_NETWORK" || !axiosError.response
+          ? "Unable to connect to the EquipLink backend server. Please check your connection."
+          : "Login failed. Please check your credentials.");
       toast.error(message);
     }
   };

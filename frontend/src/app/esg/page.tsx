@@ -22,6 +22,7 @@ import {
   Sun,
 } from "lucide-react";
 import { toast } from "sonner";
+import { downloadEsgCertificatePDF } from "@/lib/pdfGenerator";
 
 export default function ESGPage() {
   const [downloading, setDownloading] = useState(false);
@@ -52,10 +53,13 @@ export default function ESGPage() {
 
   const handleDownloadCert = () => {
     setDownloading(true);
-    setTimeout(() => {
-      setDownloading(false);
-      toast.success("Enterprise ESG Carbon Compliance Certificate downloaded!");
-    }, 1000);
+    downloadEsgCertificatePDF({
+      carbonOffsetTons: 340.5,
+      electricFleetHours: 1280,
+      sustainabilityRating: "A+ Platinum Zero Carbon",
+    });
+    setDownloading(false);
+    toast.success("Enterprise ESG Carbon Compliance Certificate generated & opened for print/download!");
   };
 
   return (

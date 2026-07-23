@@ -103,4 +103,24 @@ public class BookingController {
         BookingResponse response = bookingService.cancelBooking(id, userDetails.getUsername());
         return ResponseEntity.ok(BaseResponse.success("Booking request cancelled successfully", response));
     }
+
+    @Operation(summary = "Complete live video inspection verification for a booking")
+    @PostMapping("/{id}/verify-video")
+    public ResponseEntity<BaseResponse<BookingSummaryResponse>> verifyVideo(
+            @PathVariable Long id,
+            @AuthenticationPrincipal UserDetails userDetails
+    ) {
+        BookingSummaryResponse response = bookingService.verifyVideoInspection(id, userDetails.getUsername());
+        return ResponseEntity.ok(BaseResponse.success("Live video inspection verified successfully", response));
+    }
+
+    @Operation(summary = "Complete machinery document verification for a booking")
+    @PostMapping("/{id}/verify-documents")
+    public ResponseEntity<BaseResponse<BookingSummaryResponse>> verifyDocuments(
+            @PathVariable Long id,
+            @AuthenticationPrincipal UserDetails userDetails
+    ) {
+        BookingSummaryResponse response = bookingService.verifyDocuments(id, userDetails.getUsername());
+        return ResponseEntity.ok(BaseResponse.success("Machinery documents verified successfully", response));
+    }
 }

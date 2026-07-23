@@ -79,7 +79,10 @@ export default function RegisterPage() {
     } catch (err) {
       const axiosError = err as AxiosError<ApiError>;
       const message =
-        axiosError.response?.data?.message || "Registration failed. Please try again.";
+        axiosError.response?.data?.message ||
+        (axiosError.code === "ERR_NETWORK" || !axiosError.response
+          ? "Unable to connect to the EquipLink backend server. Please check your connection."
+          : "Registration failed. Please try again.");
       toast.error(message);
     }
   };
@@ -95,13 +98,14 @@ export default function RegisterPage() {
       </div>
 
       {/* Form */}
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-5" noValidate>
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-5" noValidate suppressHydrationWarning>
         {/* Role Selection Tabs */}
         <div className="space-y-2">
           <Label>Select Account Type</Label>
           <div className="grid grid-cols-2 gap-4">
             <button
               type="button"
+              suppressHydrationWarning
               onClick={() => setValue("role", "CUSTOMER")}
               className={`flex items-center justify-center p-3 rounded-lg border text-sm font-medium transition-all ${
                 selectedRole === "CUSTOMER"
@@ -114,6 +118,7 @@ export default function RegisterPage() {
             </button>
             <button
               type="button"
+              suppressHydrationWarning
               onClick={() => setValue("role", "OWNER")}
               className={`flex items-center justify-center p-3 rounded-lg border text-sm font-medium transition-all ${
                 selectedRole === "OWNER"
