@@ -24,32 +24,15 @@ import {
 import { toast } from "sonner";
 import { downloadEsgCertificatePDF } from "@/lib/pdfGenerator";
 
+import { useAllEquipment } from "@/lib/api/equipmentService";
+
 export default function ESGPage() {
   const [downloading, setDownloading] = useState(false);
+  const { data: pageData, isLoading: loadingEquipment } = useAllEquipment({ size: 50 });
 
-  const ecoMachinery = [
-    {
-      name: "Caterpillar 320 Zeller Electric Excavator",
-      type: "Zero-Emission Electric Excavator",
-      battery: "300 kWh Lithium-Ion Pack",
-      runtime: "8 Operating Hours / Charge",
-      co2Saved: "45 Tons CO2 / Month",
-    },
-    {
-      name: "Volvo L25 Electric Wheel Loader",
-      type: "Compact Electric Loader",
-      battery: "40 kWh Battery Pack",
-      runtime: "6 Operating Hours / Charge",
-      co2Saved: "18 Tons CO2 / Month",
-    },
-    {
-      name: "JCB 19E-1 Electric Mini Excavator",
-      type: "Urban Zero-Noise Excavator",
-      battery: "20 kWh Lithium Battery",
-      runtime: "5 Operating Hours / Charge",
-      co2Saved: "12 Tons CO2 / Month",
-    },
-  ];
+  const electricEquip = pageData?.content?.filter(
+    (item) => item.powerType === "ELECTRIC" || item.powerType === "HYBRID"
+  ) || [];
 
   const handleDownloadCert = () => {
     setDownloading(true);
@@ -142,32 +125,47 @@ export default function ESGPage() {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {ecoMachinery.map((item, idx) => (
-              <Card key={idx} className="border shadow-sm hover:border-emerald-500 transition-all">
-                <CardHeader>
-                  <div className="flex items-center justify-between">
-                    <Badge className="bg-emerald-600 text-white text-[10px] font-bold">Electric Fleet</Badge>
-                    <span className="text-xs font-bold text-emerald-600 dark:text-emerald-400 flex items-center">
-                      <TrendingDown className="w-3.5 h-3.5 mr-1" /> {item.co2Saved}
-                    </span>
-                  </div>
-                  <CardTitle className="text-lg mt-2">{item.name}</CardTitle>
-                  <CardDescription className="text-xs">{item.type}</CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-2 text-xs pt-0">
-                  <div className="flex justify-between border-t pt-2 text-muted-foreground">
-                    <span>Battery Capacity:</span>
-                    <span className="font-bold text-foreground">{item.battery}</span>
-                  </div>
-                  <div className="flex justify-between text-muted-foreground">
-                    <span>Shift Runtime:</span>
-                    <span className="font-bold text-foreground">{item.runtime}</span>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
+          {electricEquip.length === 0 ? (
+            <div className="p-8 border rounded-2xl bg-card text-center space-y-3">
+              <Zap className="w-10 h-10 text-amber-500 mx-auto" />
+              <h3 className="text-base font-bold">No Zero-Emission Machinery Listed Yet</h3>
+              <p className="text-xs text-muted-foreground max-w-md mx-auto">
+                Be the first machine owner to list 100% Zero-Emission Electric (EV) or Hybrid heavy machinery on EquipLink and earn ESG Carbon Compliance certifications!
+              </p>
+              <Button asChild size="sm" className="font-bold">
+                <Link href="/dashboard/owner/equipment/new">List EV Machinery Now</Link>
+              </Button>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {electricEquip.map((item) => (
+                <Card key={item.id} className="border shadow-sm hover:border-emerald-500 transition-all">
+                  <CardHeader>
+                    <div className="flex items-center justify-between">
+                      <Badge className="bg-emerald-600 text-white text-[10px] font-bold">
+                        {item.powerType === "ELECTRIC" ? "100% EV Electric" : "Hybrid Drive"}
+                      </Badge>
+                      <span className="text-xs font-bold text-emerald-600 dark:text-emerald-400 flex items-center">
+                        <TrendingDown className="w-3.5 h-3.5 mr-1" /> Verified EV
+                      </span>
+                    </div>
+                    <CardTitle className="text-lg mt-2">{item.name}</CardTitle>
+                    <CardDescription className="text-xs">{item.brand} {item.model} ({item.categoryName})</CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-2 text-xs pt-0">
+                    <div className="flex justify-between border-t pt-2 text-muted-foreground">
+                      <span>Battery Pack:</span>
+                      <span className="font-bold text-foreground">{item.batteryCapacityKwh ? `${item.batteryCapacityKwh} kWh` : "Standard EV"}</span>
+                    </div>
+                    <div className="flex justify-between text-muted-foreground">
+                      <span>Charging Port:</span>
+                      <span className="font-bold text-foreground">{item.chargingType || "CCS2 DC Fast"}</span>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          )}
         </div>
 
         {/* Certificate Download Box */}

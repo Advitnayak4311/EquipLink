@@ -1,6 +1,5 @@
 package com.equiplink.config;
 
-import com.equiplink.repository.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
@@ -9,6 +8,7 @@ import org.springframework.stereotype.Component;
 
 /**
  * Startup runner ensuring a clean database environment with zero dummy listings or fake test data.
+ * Does not auto-delete real user listings or user accounts on restart.
  * Runs AFTER CategoryDataLoader (Order 2).
  */
 @Component
@@ -17,20 +17,8 @@ import org.springframework.stereotype.Component;
 @Slf4j
 public class EquipmentDataLoader implements CommandLineRunner {
 
-    private final EquipmentRepository equipmentRepository;
-    private final BookingRepository bookingRepository;
-    private final ReviewRepository reviewRepository;
-    private final WishlistRepository wishlistRepository;
-    private final UserRepository userRepository;
-
     @Override
     public void run(String... args) {
-        log.info("Cleaning database to ensure zero dummy data...");
-        wishlistRepository.deleteAll();
-        reviewRepository.deleteAll();
-        bookingRepository.deleteAll();
-        equipmentRepository.deleteAll();
-        userRepository.deleteAll();
-        log.info("Database initialized with zero dummy listings/data.");
+        log.info("Database initialized safely with zero dummy listings.");
     }
 }
