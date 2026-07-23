@@ -202,12 +202,14 @@ export default function RegisterPage() {
               type={showPassword ? "text" : "password"}
               placeholder="••••••••"
               autoComplete="new-password"
+              suppressHydrationWarning
               aria-invalid={!!errors.password}
               className="pr-10"
               {...register("password")}
             />
             <button
               type="button"
+              suppressHydrationWarning
               onClick={() => setShowPassword(!showPassword)}
               className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
               aria-label={showPassword ? "Hide password" : "Show password"}
