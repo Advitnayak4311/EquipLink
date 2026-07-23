@@ -64,7 +64,11 @@ export default function ImageUpload({
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
         {/* Previews */}
         {value.map((url) => {
-          const displayUrl = `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080/api"}/..${url}`;
+          const displayUrl = url.startsWith("http://") || url.startsWith("https://")
+            ? url
+            : url.startsWith("/uploads/")
+            ? `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080/api"}/..${url}`
+            : url;
           return (
             <div
               key={url}

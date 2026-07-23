@@ -18,24 +18,33 @@ import { useGenerateDescription, useAnalyzeListing, ListingAnalysisResponse } fr
 
 const currentYear = new Date().getFullYear();
 
+const DEFAULT_EQUIPMENT_IMAGE = "https://images.unsplash.com/photo-1579621970563-ebec7560ff3e?q=80&w=800&auto=format&fit=crop";
+
 // ---- Zod Form Schema ----
 
 const equipmentFormSchema = z.object({
   name: z.string().min(1, "Equipment name is required").max(150),
   brand: z.string().min(1, "Brand is required"),
   model: z.string().min(1, "Model is required"),
-  manufactureYear: z
+  manufactureYear: z.coerce
     .number({ message: "Manufacture year is required" })
     .min(1900, "Manufacture year must be at least 1900")
     .max(currentYear, `Manufacture year cannot exceed ${currentYear}`),
-  categoryId: z.number({ message: "Category is required" }).positive("Select a category"),
+  categoryId: z.coerce.number({ message: "Category is required" }).positive("Please select a machinery category"),
   description: z.string().min(1, "Description is required").max(2000),
-  dailyRentalPrice: z
+  dailyRentalPrice: z.coerce
     .number({ message: "Daily rental price is required" })
     .positive("Rental price must be positive"),
   location: z.string().min(1, "Location address is required"),
-  availabilityStatus: z.enum(["AVAILABLE", "BOOKED", "MAINTENANCE", "UNAVAILABLE"] as const),
-  imageUrls: z.array(z.string()).min(1, "At least one equipment image is required"),
+  availabilityStatus: z.enum(["AVAILABLE", "BOOKED", "MAINTENANCE", "UNAVAILABLE"] as const).default("AVAILABLE"),
+  powerType: z.enum(["DIESEL", "ELECTRIC", "HYBRID"] as const).optional().default("DIESEL"),
+  batteryCapacityKwh: z.preprocess(
+    (val) => (val === "" || val === null || val === undefined || Number.isNaN(val) ? null : Number(val)),
+    z.number().nullable().optional()
+  ),
+  chargingType: z.string().optional().nullable().transform((val) => val || ""),
+  evTermsAccepted: z.boolean().optional().default(false),
+  imageUrls: z.array(z.string()).optional().default([]).transform((urls) => (urls && urls.length > 0 ? urls : [DEFAULT_EQUIPMENT_IMAGE])),
 });
 
 export type EquipmentFormValues = z.infer<typeof equipmentFormSchema>;
@@ -74,7 +83,11 @@ export default function EquipmentForm({
       dailyRentalPrice: 1000,
       location: "",
       availabilityStatus: "AVAILABLE",
-      imageUrls: [],
+      powerType: "DIESEL",
+      batteryCapacityKwh: null,
+      chargingType: "",
+      evTermsAccepted: false,
+      imageUrls: [DEFAULT_EQUIPMENT_IMAGE],
       ...initialValues,
     },
   });
@@ -167,8 +180,19 @@ ${res.safetyNotes}`;
     }
   };
 
+  const onFormError = (errors: any) => {
+    console.error("EquipmentForm validation errors:", errors);
+    const firstErrorKey = Object.keys(errors)[0];
+    const firstError = errors[firstErrorKey];
+    if (firstError?.message) {
+      toast.error(`Please fix: ${firstError.message}`);
+    } else {
+      toast.error("Please complete all required machinery details.");
+    }
+  };
+
   return (
-    <form onSubmit={handleSubmit(onFormSubmit)} className="space-y-6" noValidate>
+    <form onSubmit={handleSubmit(onFormSubmit, onFormError)} className="space-y-6">
       {/* Name, Brand, Model */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div className="space-y-1.5">
