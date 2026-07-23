@@ -28,9 +28,10 @@ public interface BookingRepository extends JpaRepository<Booking, Long>, JpaSpec
             @Param("endDate") LocalDate endDate
     );
 
-    long countByEquipmentOwnerEmailAndStatus(String email, BookingStatus status);
+    @Query("SELECT COUNT(b) FROM Booking b WHERE LOWER(b.equipment.owner.email) = LOWER(:email) AND b.status = :status")
+    long countByEquipmentOwnerEmailIgnoreCaseAndStatus(@Param("email") String email, @Param("status") BookingStatus status);
 
-    @Query("SELECT COUNT(b) > 0 FROM Booking b WHERE b.customer.email = :email " +
+    @Query("SELECT COUNT(b) > 0 FROM Booking b WHERE LOWER(b.customer.email) = LOWER(:email) " +
            "AND b.equipment.id = :equipmentId " +
            "AND (b.status = com.equiplink.entity.enums.BookingStatus.APPROVED OR b.status = com.equiplink.entity.enums.BookingStatus.COMPLETED)")
     boolean hasApprovedOrCompletedBooking(
@@ -38,9 +39,11 @@ public interface BookingRepository extends JpaRepository<Booking, Long>, JpaSpec
             @Param("equipmentId") Long equipmentId
     );
 
-    long countByCustomerEmail(String email);
+    @Query("SELECT COUNT(b) FROM Booking b WHERE LOWER(b.customer.email) = LOWER(:email)")
+    long countByCustomerEmailIgnoreCase(@Param("email") String email);
 
-    long countByCustomerEmailAndStatus(String email, BookingStatus status);
+    @Query("SELECT COUNT(b) FROM Booking b WHERE LOWER(b.customer.email) = LOWER(:email) AND b.status = :status")
+    long countByCustomerEmailIgnoreCaseAndStatus(@Param("email") String email, @Param("status") BookingStatus status);
 
     long countByStatus(BookingStatus status);
 }

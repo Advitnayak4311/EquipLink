@@ -98,28 +98,29 @@ public class DashboardServiceImpl implements DashboardService {
     @Override
     @Transactional(readOnly = true)
     public OwnerDashboardResponse getOwnerDashboard(String ownerEmail) {
-        long totalEquipment = equipmentRepository.countByOwnerEmail(ownerEmail);
-        long availableEquipment = equipmentRepository.countByOwnerEmailAndAvailabilityStatus(ownerEmail, EquipmentStatus.AVAILABLE);
-        long bookedEquipment = equipmentRepository.countByOwnerEmailAndAvailabilityStatus(ownerEmail, EquipmentStatus.BOOKED);
-        long pendingBookings = bookingRepository.countByEquipmentOwnerEmailAndStatus(ownerEmail, BookingStatus.PENDING);
+        String cleanEmail = ownerEmail != null ? ownerEmail.trim().toLowerCase() : "";
+        long totalEquipment = equipmentRepository.countByOwnerEmailIgnoreCase(cleanEmail);
+        long availableEquipment = equipmentRepository.countByOwnerEmailAndAvailabilityStatusIgnoreCase(cleanEmail, EquipmentStatus.AVAILABLE);
+        long bookedEquipment = equipmentRepository.countByOwnerEmailAndAvailabilityStatusIgnoreCase(cleanEmail, EquipmentStatus.BOOKED);
+        long pendingBookings = bookingRepository.countByEquipmentOwnerEmailIgnoreCaseAndStatus(cleanEmail, BookingStatus.PENDING);
 
         // Recent owner listed items
         List<Equipment> myEquip = equipmentRepository.findAll(
-                (root, query, cb) -> cb.equal(root.get("owner").get("email"), ownerEmail),
+                (root, query, cb) -> cb.equal(cb.lower(root.get("owner").get("email")), cleanEmail),
                 PageRequest.of(0, 5, Sort.by(Sort.Direction.DESC, "createdAt"))
         ).getContent();
         List<EquipmentSummaryResponse> recentEquipment = equipmentMapper.toSummaryResponses(myEquip);
 
         // Recent incoming booking requests
         List<Booking> incomingBookings = bookingRepository.findAll(
-                (root, query, cb) -> cb.equal(root.get("equipment").get("owner").get("email"), ownerEmail),
+                (root, query, cb) -> cb.equal(cb.lower(root.get("equipment").get("owner").get("email")), cleanEmail),
                 PageRequest.of(0, 5, Sort.by(Sort.Direction.DESC, "createdAt"))
         ).getContent();
         List<BookingSummaryResponse> recentBookings = bookingMapper.toSummaryResponses(incomingBookings);
 
         // Monthly bookings chart (Owner chart)
         List<Booking> allOwnerBookings = bookingRepository.findAll(
-                (root, query, cb) -> cb.equal(root.get("equipment").get("owner").get("email"), ownerEmail)
+                (root, query, cb) -> cb.equal(cb.lower(root.get("equipment").get("owner").get("email")), cleanEmail)
         );
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMM yyyy");
         Map<String, Long> bookingsPerMonth = allOwnerBookings.stream()
@@ -139,21 +140,22 @@ public class DashboardServiceImpl implements DashboardService {
     @Override
     @Transactional(readOnly = true)
     public CustomerDashboardResponse getCustomerDashboard(String customerEmail) {
-        long totalBookings = bookingRepository.countByCustomerEmail(customerEmail);
-        long approvedBookings = bookingRepository.countByCustomerEmailAndStatus(customerEmail, BookingStatus.APPROVED);
-        long pendingBookings = bookingRepository.countByCustomerEmailAndStatus(customerEmail, BookingStatus.PENDING);
-        long wishlistCount = wishlistRepository.countByCustomerEmail(customerEmail);
+        String cleanEmail = customerEmail != null ? customerEmail.trim().toLowerCase() : "";
+        long totalBookings = bookingRepository.countByCustomerEmailIgnoreCase(cleanEmail);
+        long approvedBookings = bookingRepository.countByCustomerEmailIgnoreCaseAndStatus(cleanEmail, BookingStatus.APPROVED);
+        long pendingBookings = bookingRepository.countByCustomerEmailIgnoreCaseAndStatus(cleanEmail, BookingStatus.PENDING);
+        long wishlistCount = wishlistRepository.countByCustomerEmail(cleanEmail);
 
         // Recent customer bookings
         List<Booking> myBookings = bookingRepository.findAll(
-                (root, query, cb) -> cb.equal(root.get("customer").get("email"), customerEmail),
+                (root, query, cb) -> cb.equal(cb.lower(root.get("customer").get("email")), cleanEmail),
                 PageRequest.of(0, 5, Sort.by(Sort.Direction.DESC, "createdAt"))
         ).getContent();
         List<BookingSummaryResponse> recentBookings = bookingMapper.toSummaryResponses(myBookings);
 
         // Recent saved wishlist items
         List<Wishlist> myWishlist = wishlistRepository.findByCustomerEmail(
-                customerEmail, PageRequest.of(0, 5, Sort.by(Sort.Direction.DESC, "createdAt"))
+                cleanEmail, PageRequest.of(0, 5, Sort.by(Sort.Direction.DESC, "createdAt"))
         );
         List<EquipmentSummaryResponse> recentWishlist = myWishlist.stream()
                 .map(w -> equipmentMapper.toSummaryResponse(w.getEquipment()))
