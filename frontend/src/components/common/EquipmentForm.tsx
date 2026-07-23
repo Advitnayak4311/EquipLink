@@ -87,6 +87,8 @@ export default function EquipmentForm({
   const analyzeListingMutation = useAnalyzeListing();
 
   const watchedValues = watch();
+  const selectedPowerType = watch("powerType") || "DIESEL";
+  const isDiesel = selectedPowerType === "DIESEL";
 
   const handleGenerateDescription = async () => {
     if (!watchedValues.name || !watchedValues.brand || !watchedValues.model || !watchedValues.categoryId) {
@@ -294,7 +296,7 @@ ${res.safetyNotes}`;
             <Zap className="w-4 h-4 text-amber-500 mr-2" /> Power Drive System & EV Charging Specs
           </h4>
           <Badge variant="outline" className="text-[10px] font-extrabold border-amber-500/30 text-amber-600 bg-amber-500/10 uppercase tracking-wider">
-            Electric & Diesel Specs
+            {isDiesel ? "Standard Diesel Specs" : "Electric EV Specs Active"}
           </Badge>
         </div>
 
@@ -304,7 +306,7 @@ ${res.safetyNotes}`;
             <select
               id="powerType"
               suppressHydrationWarning
-              className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring font-semibold"
               {...register("powerType")}
             >
               <option value="DIESEL">⛽ Diesel Engine</option>
@@ -314,35 +316,52 @@ ${res.safetyNotes}`;
           </div>
 
           <div className="space-y-1.5">
-            <Label htmlFor="batteryCapacityKwh" className="text-xs font-semibold text-foreground">Battery Pack (kWh)</Label>
+            <Label
+              htmlFor="batteryCapacityKwh"
+              className={`text-xs font-semibold ${isDiesel ? "text-muted-foreground" : "text-foreground"}`}
+            >
+              Battery Pack (kWh) {isDiesel && <span className="text-[10px] text-amber-600 font-bold">(EV Only)</span>}
+            </Label>
             <Input
               id="batteryCapacityKwh"
               type="number"
-              placeholder="e.g. 200 (Optional for Diesel)"
-              className="bg-background border-input text-foreground text-sm"
+              disabled={isDiesel}
+              placeholder={isDiesel ? "N/A (Diesel Machinery)" : "e.g. 200"}
+              className="bg-background border-input text-foreground text-sm disabled:opacity-50 disabled:bg-muted disabled:cursor-not-allowed"
               {...register("batteryCapacityKwh", { valueAsNumber: true })}
             />
           </div>
 
           <div className="space-y-1.5">
-            <Label htmlFor="chargingType" className="text-xs font-semibold text-foreground">Charging Interface</Label>
+            <Label
+              htmlFor="chargingType"
+              className={`text-xs font-semibold ${isDiesel ? "text-muted-foreground" : "text-foreground"}`}
+            >
+              Charging Interface {isDiesel && <span className="text-[10px] text-amber-600 font-bold">(EV Only)</span>}
+            </Label>
             <Input
               id="chargingType"
-              placeholder="e.g. CCS2 DC Fast / 415V AC"
-              className="bg-background border-input text-foreground text-sm"
+              type="text"
+              disabled={isDiesel}
+              placeholder={isDiesel ? "N/A (Diesel Machinery)" : "e.g. CCS2 DC Fast / 415V AC"}
+              className="bg-background border-input text-foreground text-sm disabled:opacity-50 disabled:bg-muted disabled:cursor-not-allowed"
               {...register("chargingType")}
             />
           </div>
         </div>
 
-        <div className="flex items-center space-x-2 pt-2 border-t border-amber-500/20">
+        <div className={`flex items-center space-x-2 pt-2 border-t border-amber-500/20 ${isDiesel ? "opacity-50" : ""}`}>
           <input
             type="checkbox"
             id="evTermsAccepted"
-            className="rounded border-input text-amber-500 focus:ring-amber-500 w-4 h-4 cursor-pointer"
+            disabled={isDiesel}
+            className="rounded border-input text-amber-500 focus:ring-amber-500 w-4 h-4 cursor-pointer disabled:cursor-not-allowed"
             {...register("evTermsAccepted")}
           />
-          <Label htmlFor="evTermsAccepted" className="text-xs text-muted-foreground cursor-pointer">
+          <Label
+            htmlFor="evTermsAccepted"
+            className={`text-xs text-muted-foreground ${isDiesel ? "cursor-not-allowed" : "cursor-pointer"}`}
+          >
             I confirm compliance with <strong className="text-foreground">EquipLink EV Battery Health & State-of-Charge (80% SOC) Return SLA</strong> terms.
           </Label>
         </div>
