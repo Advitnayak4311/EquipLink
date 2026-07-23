@@ -16,13 +16,13 @@ public interface BookingMapper {
 
     BookingResponse toResponse(Booking booking);
 
-    @Mapping(target = "equipmentId", source = "equipment.id")
-    @Mapping(target = "equipmentName", source = "equipment.name")
-    @Mapping(target = "equipmentImageUrl", expression = "java(booking.getEquipment().getImages().isEmpty() ? null : booking.getEquipment().getImages().get(0).getImageUrl())")
-    @Mapping(target = "machineLocation", source = "equipment.location")
-    @Mapping(target = "customerName", expression = "java(booking.getCustomer().getFirstName() + \" \" + booking.getCustomer().getLastName())")
-    @Mapping(target = "customerEmail", source = "customer.email")
-    @Mapping(target = "customerLocation", expression = "java(booking.getCustomer().getCity() != null && booking.getCustomer().getState() != null ? booking.getCustomer().getCity() + \", \" + booking.getCustomer().getState() : \"Customer Regional HQ\")")
+    @Mapping(target = "equipmentId", expression = "java(booking.getEquipment() != null ? booking.getEquipment().getId() : null)")
+    @Mapping(target = "equipmentName", expression = "java(booking.getEquipment() != null ? booking.getEquipment().getName() : \"Machinery\")")
+    @Mapping(target = "equipmentImageUrl", expression = "java(booking.getEquipment() != null && booking.getEquipment().getImages() != null && !booking.getEquipment().getImages().isEmpty() ? booking.getEquipment().getImages().get(0).getImageUrl() : null)")
+    @Mapping(target = "machineLocation", expression = "java(booking.getEquipment() != null ? booking.getEquipment().getLocation() : \"Location Not Specified\")")
+    @Mapping(target = "customerName", expression = "java(booking.getCustomer() != null ? (booking.getCustomer().getFirstName() != null ? booking.getCustomer().getFirstName() : \"\") + \" \" + (booking.getCustomer().getLastName() != null ? booking.getCustomer().getLastName() : \"\") : \"Customer\")")
+    @Mapping(target = "customerEmail", expression = "java(booking.getCustomer() != null ? booking.getCustomer().getEmail() : \"\")")
+    @Mapping(target = "customerLocation", expression = "java(booking.getCustomer() != null && booking.getCustomer().getCity() != null && booking.getCustomer().getState() != null ? booking.getCustomer().getCity() + \", \" + booking.getCustomer().getState() : \"Customer Regional HQ\")")
     BookingSummaryResponse toSummaryResponse(Booking booking);
 
     List<BookingSummaryResponse> toSummaryResponses(List<Booking> bookings);

@@ -123,6 +123,7 @@ public class DashboardServiceImpl implements DashboardService {
         );
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMM yyyy");
         Map<String, Long> bookingsPerMonth = allOwnerBookings.stream()
+                .filter(b -> b.getCreatedAt() != null)
                 .collect(Collectors.groupingBy(
                         b -> b.getCreatedAt().format(formatter),
                         LinkedHashMap::new,

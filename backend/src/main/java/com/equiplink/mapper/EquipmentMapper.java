@@ -16,8 +16,8 @@ public interface EquipmentMapper {
 
     EquipmentResponse toResponse(Equipment equipment);
 
-    @Mapping(target = "ownerName", expression = "java(equipment.getOwner().getFirstName() + \" \" + equipment.getOwner().getLastName())")
-    @Mapping(target = "categoryName", source = "category.name")
+    @Mapping(target = "ownerName", expression = "java(equipment.getOwner() != null ? (equipment.getOwner().getFirstName() != null ? equipment.getOwner().getFirstName() : \"\") + \" \" + (equipment.getOwner().getLastName() != null ? equipment.getOwner().getLastName() : \"\") : \"Equipment Owner\")")
+    @Mapping(target = "categoryName", expression = "java(equipment.getCategory() != null ? equipment.getCategory().getName() : \"General Machinery\")")
     EquipmentSummaryResponse toSummaryResponse(Equipment equipment);
 
     List<EquipmentSummaryResponse> toSummaryResponses(List<Equipment> equipment);
