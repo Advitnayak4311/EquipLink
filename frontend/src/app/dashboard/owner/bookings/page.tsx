@@ -226,15 +226,15 @@ export default function OwnerBookingsPage() {
                       mobilizationCost={booking.mobilizationCost || 5760}
                     />
 
-                    {/* Live Video & Document Verification Suite Controls */}
-                    <div className="p-3.5 rounded-xl bg-slate-900/40 border border-slate-800 flex flex-wrap items-center justify-between gap-3 text-xs">
+                    {/* Machinery Video Walkthrough & Compliance Document Verification Controls */}
+                    <div className="p-3.5 rounded-xl bg-card border shadow-xs flex flex-wrap items-center justify-between gap-3 text-xs">
                       <div className="flex items-center space-x-2">
-                        <Badge variant="outline" className="border-amber-500/40 text-amber-400 font-bold bg-amber-950/40 text-[10px]">
+                        <Badge variant="outline" className="border-amber-500/30 text-amber-700 dark:text-amber-400 font-extrabold bg-amber-500/10 text-[10px]">
                           <ShieldCheck className="w-3 h-3 mr-1 inline" />
                           Verification: {booking.verificationStatus || "UNVERIFIED"}
                         </Badge>
                         <span className="text-[11px] text-muted-foreground hidden sm:inline">
-                          Demonstrate machinery live over video or present legal RTO compliance documents.
+                          Present machinery video walkthrough or verify legal RTO compliance documents.
                         </span>
                       </div>
 
@@ -243,15 +243,15 @@ export default function OwnerBookingsPage() {
                           size="sm"
                           variant="outline"
                           onClick={() => openVideoInspection(booking)}
-                          className="text-xs font-bold border-amber-500/40 bg-amber-500/10 text-amber-400 hover:bg-amber-500 hover:text-slate-950"
+                          className="text-xs font-extrabold border-amber-500/40 bg-amber-500/10 text-amber-800 dark:text-amber-300 hover:bg-amber-500 hover:text-slate-950 shadow-2xs"
                         >
-                          <Video className="w-3.5 h-3.5 mr-1.5" /> Start Live Video Demo
+                          <Video className="w-3.5 h-3.5 mr-1.5" /> Machinery Video Walkthrough
                         </Button>
                         <Button
                           size="sm"
                           variant="outline"
                           onClick={() => openDocInspection(booking)}
-                          className="text-xs font-bold border-emerald-500/40 bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500 hover:text-slate-950"
+                          className="text-xs font-extrabold border-emerald-500/40 bg-emerald-500/10 text-emerald-800 dark:text-emerald-300 hover:bg-emerald-500 hover:text-slate-950 shadow-2xs"
                         >
                           <FileCheck className="w-3.5 h-3.5 mr-1.5" /> Present RC & Permits
                         </Button>

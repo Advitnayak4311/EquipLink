@@ -44,6 +44,11 @@ const equipmentFormSchema = z.object({
   ),
   chargingType: z.string().optional().nullable().transform((val) => val || ""),
   evTermsAccepted: z.boolean().optional().default(false),
+  inspectionVideoUrl: z.string().optional().nullable().transform((val) => val || ""),
+  rcDocNumber: z.string().optional().nullable().transform((val) => val || ""),
+  insuranceDocNumber: z.string().optional().nullable().transform((val) => val || ""),
+  fitnessDocNumber: z.string().optional().nullable().transform((val) => val || ""),
+  operatorLicenseNumber: z.string().optional().nullable().transform((val) => val || ""),
   imageUrls: z.array(z.string()).optional().default([]).transform((urls) => (urls && urls.length > 0 ? urls : [DEFAULT_EQUIPMENT_IMAGE])),
 });
 
@@ -87,6 +92,11 @@ export default function EquipmentForm({
       batteryCapacityKwh: null,
       chargingType: "",
       evTermsAccepted: false,
+      inspectionVideoUrl: "",
+      rcDocNumber: "",
+      insuranceDocNumber: "",
+      fitnessDocNumber: "",
+      operatorLicenseNumber: "",
       imageUrls: [DEFAULT_EQUIPMENT_IMAGE],
       ...initialValues,
     },
@@ -388,6 +398,88 @@ ${res.safetyNotes}`;
           >
             I confirm compliance with <strong className="text-foreground">EquipLink EV Battery Health & State-of-Charge (80% SOC) Return SLA</strong> terms.
           </Label>
+        </div>
+      </div>
+
+      {/* Owner Video Walkthrough & RTO Compliance Documents (Pre-Upload) */}
+      <div className="p-4 rounded-xl border border-blue-500/20 bg-blue-500/5 space-y-4 font-sans">
+        <div className="flex items-center justify-between">
+          <h4 className="text-sm font-bold text-foreground flex items-center">
+            <Video className="w-4 h-4 text-blue-500 mr-2" /> Owner Vehicle Walkthrough Video & Compliance Documents
+          </h4>
+          <Badge variant="outline" className="text-[10px] font-extrabold border-blue-500/30 text-blue-600 dark:text-blue-400 bg-blue-500/10 uppercase tracking-wider">
+            Mandatory Verification Pre-Uploads
+          </Badge>
+        </div>
+        <p className="text-xs text-muted-foreground">
+          Upload a detailed walkthrough video and legal compliance documents of your vehicle so customers can inspect them before booking.
+        </p>
+
+        <div className="space-y-1.5">
+          <Label htmlFor="inspectionVideoUrl" className="text-xs font-semibold text-foreground">
+            Detailed Vehicle Inspection Video (MP4 Walkthrough / URL)
+          </Label>
+          <Input
+            id="inspectionVideoUrl"
+            type="text"
+            placeholder="e.g. https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4 or video link"
+            className="bg-background border-input text-foreground text-sm"
+            {...register("inspectionVideoUrl")}
+          />
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="space-y-1.5">
+            <Label htmlFor="rcDocNumber" className="text-xs font-semibold text-foreground">
+              RTO Registration Certificate (RC / VIN No.)
+            </Label>
+            <Input
+              id="rcDocNumber"
+              type="text"
+              placeholder="e.g. KA-02-MH-8849 / VIN-EQ-2026-X8849"
+              className="bg-background border-input text-foreground text-sm"
+              {...register("rcDocNumber")}
+            />
+          </div>
+
+          <div className="space-y-1.5">
+            <Label htmlFor="insuranceDocNumber" className="text-xs font-semibold text-foreground">
+              Commercial Insurance Policy No.
+            </Label>
+            <Input
+              id="insuranceDocNumber"
+              type="text"
+              placeholder="e.g. INS-POL-99201-HE (₹5 Cr Coverage)"
+              className="bg-background border-input text-foreground text-sm"
+              {...register("insuranceDocNumber")}
+            />
+          </div>
+
+          <div className="space-y-1.5">
+            <Label htmlFor="fitnessDocNumber" className="text-xs font-semibold text-foreground">
+              RTO Mechanical Fitness & Emission Cert No.
+            </Label>
+            <Input
+              id="fitnessDocNumber"
+              type="text"
+              placeholder="e.g. FIT-CEV-STAGE-IV-2026"
+              className="bg-background border-input text-foreground text-sm"
+              {...register("fitnessDocNumber")}
+            />
+          </div>
+
+          <div className="space-y-1.5">
+            <Label htmlFor="operatorLicenseNumber" className="text-xs font-semibold text-foreground">
+              Certified Heavy Operator License No.
+            </Label>
+            <Input
+              id="operatorLicenseNumber"
+              type="text"
+              placeholder="e.g. DL-HEAVY-EXCAVATOR-9982"
+              className="bg-background border-input text-foreground text-sm"
+              {...register("operatorLicenseNumber")}
+            />
+          </div>
         </div>
       </div>
 

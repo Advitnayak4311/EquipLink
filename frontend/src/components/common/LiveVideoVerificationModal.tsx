@@ -4,18 +4,12 @@ import { useState } from "react";
 import { toast } from "sonner";
 import {
   Video,
-  Mic,
-  MicOff,
-  VideoOff,
   ShieldCheck,
   CheckCircle2,
-  AlertCircle,
   Truck,
-  Activity,
-  Maximize2,
-  Clock,
-  Radio,
   FileCheck,
+  Play,
+  Check,
 } from "lucide-react";
 import {
   Dialog,
@@ -32,7 +26,7 @@ interface LiveVideoVerificationModalProps {
   onOpenChange: (open: boolean) => void;
   bookingId: number;
   equipmentName: string;
-  videoCallRoomId?: string;
+  videoUrl?: string;
   isVerified?: boolean;
   onVerifySuccess?: () => void;
 }
@@ -42,31 +36,21 @@ export default function LiveVideoVerificationModal({
   onOpenChange,
   bookingId,
   equipmentName,
-  videoCallRoomId = "equiplink-live-session-101",
+  videoUrl = "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
   isVerified = false,
   onVerifySuccess,
 }: LiveVideoVerificationModalProps) {
-  const [micOn, setMicOn] = useState(true);
-  const [videoOn, setVideoOn] = useState(true);
-  const [activeCam, setActiveCam] = useState<"engine" | "cabin" | "hourmeter">("engine");
   const [verifying, setVerifying] = useState(false);
-  const [checklist, setChecklist] = useState({
-    engineStart: true,
-    hourMeterMatch: true,
-    hydraulicFluidCheck: true,
-    chassisNoDamage: true,
-  });
 
   const handleCompleteVerification = async () => {
     setVerifying(true);
     try {
-      // Simulate verification API delay
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      toast.success("Live Machinery Video Inspection verified successfully!");
+      await new Promise((resolve) => setTimeout(resolve, 800));
+      toast.success("Machinery video walkthrough verified successfully!");
       if (onVerifySuccess) onVerifySuccess();
       onOpenChange(false);
     } catch {
-      toast.error("Failed to complete video verification.");
+      toast.error("Failed to complete video inspection sign-off.");
     } finally {
       setVerifying(false);
     }
@@ -74,151 +58,77 @@ export default function LiveVideoVerificationModal({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-3xl bg-slate-950 text-slate-100 border-slate-800 p-6 font-sans">
+      <DialogContent className="max-w-3xl bg-card text-card-foreground border shadow-2xl p-6 font-sans">
         <DialogHeader>
           <div className="flex items-center justify-between">
-            <DialogTitle className="text-xl font-extrabold flex items-center gap-2 font-heading text-white">
+            <DialogTitle className="text-xl font-extrabold flex items-center gap-2 font-heading text-foreground">
               <Video className="w-5 h-5 text-amber-500" />
-              Live Machinery Inspection Room
+              Machinery Video Inspection & Walkthrough
             </DialogTitle>
             <Badge
               variant="outline"
-              className="border-emerald-500/40 text-emerald-400 bg-emerald-950/40 text-xs px-2.5 py-0.5"
+              className="border-emerald-500/30 text-emerald-700 dark:text-emerald-400 bg-emerald-500/10 text-xs px-2.5 py-0.5 font-bold"
             >
-              <Radio className="w-3 h-3 mr-1 inline animate-pulse" /> Live Stream Active
+              <CheckCircle2 className="w-3 h-3 mr-1 inline" /> Owner Video Uploaded
             </Badge>
           </div>
-          <DialogDescription className="text-xs text-slate-400">
-            Live video verification feed for <strong>{equipmentName}</strong> (Session ID: {videoCallRoomId})
+          <DialogDescription className="text-xs text-muted-foreground">
+            Review detailed machinery video walkthrough uploaded by owner for <strong>{equipmentName}</strong> (Booking #{bookingId})
           </DialogDescription>
         </DialogHeader>
 
-        {/* Video Player Display Screen */}
-        <div className="relative aspect-video w-full rounded-2xl bg-slate-900 overflow-hidden border border-slate-800 flex items-center justify-center">
-          {videoOn ? (
-            <div className="relative w-full h-full bg-slate-950 flex flex-col justify-between p-4">
-              {/* Overlay Top Bar */}
-              <div className="flex items-center justify-between text-xs z-10">
-                <div className="flex items-center space-x-2 bg-slate-900/80 px-3 py-1 rounded-full border border-slate-700">
-                  <Activity className="w-3.5 h-3.5 text-amber-400" />
-                  <span className="font-bold uppercase text-[10px] text-amber-300">
-                    Cam: {activeCam === "engine" ? "Engine Bay Run Test" : activeCam === "cabin" ? "Operator Cabin" : "Digital Hour Meter Telematics"}
-                  </span>
-                </div>
-                <div className="flex items-center space-x-2 bg-slate-900/80 px-3 py-1 rounded-full border border-slate-700 text-[10px]">
-                  <Clock className="w-3 h-3 text-emerald-400" />
-                  <span>08:42 Live HD 1080p</span>
-                </div>
-              </div>
-
-              {/* Simulated Camera Video Stream Content */}
-              <div className="my-auto text-center space-y-3 z-10">
-                <div className="w-16 h-16 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-400 flex items-center justify-center mx-auto shadow-xl glow-amber">
-                  <Truck className="w-8 h-8 animate-bounce" />
-                </div>
-                <div className="space-y-1">
-                  <p className="text-sm font-extrabold text-white">
-                    {equipmentName} – Live Machine Demonstration
-                  </p>
-                  <p className="text-xs text-slate-400">
-                    Owner is demonstrating cold engine start, hydraulic pump pressure, and hour meter telemetry.
-                  </p>
-                </div>
-              </div>
-
-              {/* Overlay Bottom Controls */}
-              <div className="flex items-center justify-between z-10">
-                <div className="flex items-center space-x-2">
-                  <Button
-                    size="sm"
-                    variant={activeCam === "engine" ? "default" : "outline"}
-                    onClick={() => setActiveCam("engine")}
-                    className="text-[11px] h-7 px-2.5 bg-amber-500 text-slate-950 font-bold hover:bg-amber-400"
-                  >
-                    Engine Cam
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant={activeCam === "hourmeter" ? "default" : "outline"}
-                    onClick={() => setActiveCam("hourmeter")}
-                    className="text-[11px] h-7 px-2.5 border-slate-700 text-slate-200"
-                  >
-                    Hour Meter Cam
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant={activeCam === "cabin" ? "default" : "outline"}
-                    onClick={() => setActiveCam("cabin")}
-                    className="text-[11px] h-7 px-2.5 border-slate-700 text-slate-200"
-                  >
-                    Cabin Cam
-                  </Button>
-                </div>
-
-                <div className="flex items-center space-x-2">
-                  <Button
-                    size="icon"
-                    variant="outline"
-                    onClick={() => setMicOn(!micOn)}
-                    className="h-8 w-8 rounded-full border-slate-700 bg-slate-900"
-                  >
-                    {micOn ? <Mic className="w-4 h-4 text-emerald-400" /> : <MicOff className="w-4 h-4 text-rose-400" />}
-                  </Button>
-                  <Button
-                    size="icon"
-                    variant="outline"
-                    onClick={() => setVideoOn(!videoOn)}
-                    className="h-8 w-8 rounded-full border-slate-700 bg-slate-900"
-                  >
-                    {videoOn ? <Video className="w-4 h-4 text-emerald-400" /> : <VideoOff className="w-4 h-4 text-rose-400" />}
-                  </Button>
-                </div>
-              </div>
-            </div>
-          ) : (
-            <div className="text-center p-8 space-y-2">
-              <VideoOff className="w-10 h-10 text-slate-600 mx-auto" />
-              <p className="text-xs text-slate-400">Video Feed Muted</p>
-            </div>
-          )}
+        {/* Detailed Machinery Video Player */}
+        <div className="relative aspect-video w-full rounded-xl bg-black overflow-hidden border shadow-inner flex flex-col justify-between">
+          <video
+            src={videoUrl}
+            controls
+            autoPlay
+            muted
+            className="w-full h-full object-cover"
+            poster="https://images.unsplash.com/photo-1579621970563-ebec7560ff3e?q=80&w=800&auto=format&fit=crop"
+          />
+          <div className="absolute top-3 left-3 bg-background/90 backdrop-blur-md px-3 py-1 rounded-full border shadow-sm text-xs font-semibold text-foreground flex items-center gap-2">
+            <Play className="w-3 h-3 text-amber-500 fill-amber-500" />
+            <span>HD Inspection Walkthrough Video</span>
+          </div>
         </div>
 
-        {/* Machine Technical Verification Checklist */}
-        <div className="p-4 rounded-xl bg-slate-900/80 border border-slate-800 space-y-3 text-xs">
-          <h4 className="font-bold text-slate-200 uppercase tracking-wider text-[11px] flex items-center">
-            <CheckCircle2 className="w-4 h-4 text-emerald-400 mr-1.5" /> Technical Inspection Checklist
+        {/* Inspection Verification Checklist */}
+        <div className="p-4 rounded-xl bg-muted/40 border space-y-3 text-xs">
+          <h4 className="font-bold text-foreground uppercase tracking-wider text-[11px] flex items-center">
+            <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400 mr-1.5" /> Technical Inspection Checklist
           </h4>
-          <div className="grid grid-cols-2 gap-2 text-slate-300">
-            <div className="flex items-center space-x-2 bg-slate-950/60 p-2 rounded-lg border border-slate-800">
-              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
-              <span>Cold Engine Start & RPM Test</span>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-foreground">
+            <div className="flex items-center space-x-2 bg-background p-2.5 rounded-lg border shadow-xs">
+              <Check className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0 font-bold" />
+              <span className="font-medium text-xs">Cold Engine Start & RPM Pressure Test</span>
             </div>
-            <div className="flex items-center space-x-2 bg-slate-950/60 p-2 rounded-lg border border-slate-800">
-              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
-              <span>Digital Hour Meter Telematics Match</span>
+            <div className="flex items-center space-x-2 bg-background p-2.5 rounded-lg border shadow-xs">
+              <Check className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0 font-bold" />
+              <span className="font-medium text-xs">Digital Hour Meter Telematics Match</span>
             </div>
-            <div className="flex items-center space-x-2 bg-slate-950/60 p-2 rounded-lg border border-slate-800">
-              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
-              <span>Hydraulic Cylinder & Oil Fluid Test</span>
+            <div className="flex items-center space-x-2 bg-background p-2.5 rounded-lg border shadow-xs">
+              <Check className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0 font-bold" />
+              <span className="font-medium text-xs">Hydraulic Cylinder & Oil Fluid Test</span>
             </div>
-            <div className="flex items-center space-x-2 bg-slate-950/60 p-2 rounded-lg border border-slate-800">
-              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
-              <span>Track / Tire & Chassis Structural Check</span>
+            <div className="flex items-center space-x-2 bg-background p-2.5 rounded-lg border shadow-xs">
+              <Check className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0 font-bold" />
+              <span className="font-medium text-xs">Track / Tire & Chassis Structural Check</span>
             </div>
           </div>
         </div>
 
-        {/* Verification Action Buttons */}
-        <div className="flex items-center justify-between pt-2">
-          <p className="text-[11px] text-slate-400 flex items-center">
-            <ShieldCheck className="w-4 h-4 text-amber-500 mr-1" /> Verified calls are cryptographically logged for audit compliance.
+        {/* Action Bar */}
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-2">
+          <p className="text-[11px] text-muted-foreground flex items-center">
+            <ShieldCheck className="w-4 h-4 text-amber-500 mr-1 shrink-0" /> Recorded inspection videos are stored for audit compliance.
           </p>
-          <div className="flex items-center space-x-3">
+          <div className="flex items-center space-x-3 w-full sm:w-auto justify-end">
             <Button
               variant="outline"
               size="sm"
               onClick={() => onOpenChange(false)}
-              className="border-slate-700 text-slate-300 hover:bg-slate-900 text-xs"
+              className="text-xs"
             >
               Close
             </Button>
@@ -226,15 +136,15 @@ export default function LiveVideoVerificationModal({
               size="sm"
               disabled={verifying || isVerified}
               onClick={handleCompleteVerification}
-              className="bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold text-xs shadow-lg"
+              className="bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs shadow-md"
             >
               {isVerified ? (
                 <>
-                  <CheckCircle2 className="w-4 h-4 mr-1.5" /> Machine Video Verified
+                  <CheckCircle2 className="w-4 h-4 mr-1.5" /> Video Verified
                 </>
               ) : (
                 <>
-                  <FileCheck className="w-4 h-4 mr-1.5" /> Sign-Off Video Inspection
+                  <FileCheck className="w-4 h-4 mr-1.5" /> Verify & Sign-Off Video Inspection
                 </>
               )}
             </Button>
