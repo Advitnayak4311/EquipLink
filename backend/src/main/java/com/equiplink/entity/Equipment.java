@@ -69,6 +69,21 @@ public class Equipment extends BaseEntity {
     @Builder.Default
     private Boolean evTermsAccepted = false;
 
+    @Column(name = "inspection_video_url", columnDefinition = "TEXT")
+    private String inspectionVideoUrl;
+
+    @Column(name = "rc_doc_number")
+    private String rcDocNumber;
+
+    @Column(name = "insurance_doc_number")
+    private String insuranceDocNumber;
+
+    @Column(name = "fitness_doc_number")
+    private String fitnessDocNumber;
+
+    @Column(name = "operator_license_number")
+    private String operatorLicenseNumber;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "owner_id", referencedColumnName = "id", nullable = false)
     private User owner;

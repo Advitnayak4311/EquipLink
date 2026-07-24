@@ -36,11 +36,18 @@ export default function LiveVideoVerificationModal({
   onOpenChange,
   bookingId,
   equipmentName,
-  videoUrl = "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+  videoUrl,
   isVerified = false,
   onVerifySuccess,
 }: LiveVideoVerificationModalProps) {
   const [verifying, setVerifying] = useState(false);
+
+  const rawUrl = videoUrl && videoUrl.trim() ? videoUrl.trim() : "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4";
+  const displayVideoUrl = rawUrl.startsWith("http://") || rawUrl.startsWith("https://")
+    ? rawUrl
+    : rawUrl.startsWith("/uploads/")
+    ? `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080/api"}/..${rawUrl}`
+    : rawUrl;
 
   const handleCompleteVerification = async () => {
     setVerifying(true);
@@ -80,7 +87,7 @@ export default function LiveVideoVerificationModal({
         {/* Detailed Machinery Video Player */}
         <div className="relative aspect-video w-full rounded-xl bg-black overflow-hidden border shadow-inner flex flex-col justify-between">
           <video
-            src={videoUrl}
+            src={displayVideoUrl}
             controls
             autoPlay
             muted

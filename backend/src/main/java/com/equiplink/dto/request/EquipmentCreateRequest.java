@@ -51,6 +51,16 @@ public record EquipmentCreateRequest(
 
         Boolean evTermsAccepted,
 
+        String inspectionVideoUrl,
+
+        String rcDocNumber,
+
+        String insuranceDocNumber,
+
+        String fitnessDocNumber,
+
+        String operatorLicenseNumber,
+
         @NotEmpty(message = "At least one image is required")
         List<String> imageUrls
 ) {}

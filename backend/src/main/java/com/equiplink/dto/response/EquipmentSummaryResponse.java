@@ -23,6 +23,11 @@ public record EquipmentSummaryResponse(
         Double batteryCapacityKwh,
         String chargingType,
         Boolean evTermsAccepted,
+        String inspectionVideoUrl,
+        String rcDocNumber,
+        String insuranceDocNumber,
+        String fitnessDocNumber,
+        String operatorLicenseNumber,
         List<EquipmentImageResponse> images,
         String ownerName,
         String categoryName

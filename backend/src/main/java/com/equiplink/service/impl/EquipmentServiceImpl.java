@@ -92,6 +92,11 @@ public class EquipmentServiceImpl implements EquipmentService {
                 .batteryCapacityKwh(request.batteryCapacityKwh())
                 .chargingType(request.chargingType())
                 .evTermsAccepted(request.evTermsAccepted() != null ? request.evTermsAccepted() : false)
+                .inspectionVideoUrl(request.inspectionVideoUrl())
+                .rcDocNumber(request.rcDocNumber())
+                .insuranceDocNumber(request.insuranceDocNumber())
+                .fitnessDocNumber(request.fitnessDocNumber())
+                .operatorLicenseNumber(request.operatorLicenseNumber())
                 .owner(owner)
                 .category(category)
                 .build();
@@ -133,6 +138,15 @@ public class EquipmentServiceImpl implements EquipmentService {
         equipment.setLocation(request.location());
         equipment.setAvailabilityStatus(request.availabilityStatus());
         equipment.setCategory(category);
+        if (request.powerType() != null) equipment.setPowerType(request.powerType());
+        equipment.setBatteryCapacityKwh(request.batteryCapacityKwh());
+        equipment.setChargingType(request.chargingType());
+        if (request.evTermsAccepted() != null) equipment.setEvTermsAccepted(request.evTermsAccepted());
+        equipment.setInspectionVideoUrl(request.inspectionVideoUrl());
+        equipment.setRcDocNumber(request.rcDocNumber());
+        equipment.setInsuranceDocNumber(request.insuranceDocNumber());
+        equipment.setFitnessDocNumber(request.fitnessDocNumber());
+        equipment.setOperatorLicenseNumber(request.operatorLicenseNumber());
 
         equipmentRepository.save(equipment);
         log.info("Successfully updated equipment listing: {}", equipment.getId());

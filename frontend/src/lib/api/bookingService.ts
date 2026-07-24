@@ -37,6 +37,7 @@ export interface BookingSummaryResponse {
   status: BookingStatus;
   verificationStatus?: VerificationStatus;
   videoCallRoomId?: string;
+  inspectionVideoUrl?: string;
   rcDocumentUrl?: string;
   insuranceDocumentUrl?: string;
   fitnessCertificateUrl?: string;

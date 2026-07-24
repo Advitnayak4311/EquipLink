@@ -23,6 +23,11 @@ public interface BookingMapper {
     @Mapping(target = "customerName", expression = "java(booking.getCustomer() != null ? (booking.getCustomer().getFirstName() != null ? booking.getCustomer().getFirstName() : \"\") + \" \" + (booking.getCustomer().getLastName() != null ? booking.getCustomer().getLastName() : \"\") : \"Customer\")")
     @Mapping(target = "customerEmail", expression = "java(booking.getCustomer() != null ? booking.getCustomer().getEmail() : \"\")")
     @Mapping(target = "customerLocation", expression = "java(booking.getCustomer() != null && booking.getCustomer().getCity() != null && booking.getCustomer().getState() != null ? booking.getCustomer().getCity() + \", \" + booking.getCustomer().getState() : \"Customer Regional HQ\")")
+    @Mapping(target = "inspectionVideoUrl", expression = "java(booking.getEquipment() != null ? booking.getEquipment().getInspectionVideoUrl() : null)")
+    @Mapping(target = "rcDocumentUrl", expression = "java(booking.getEquipment() != null && booking.getEquipment().getRcDocNumber() != null ? booking.getEquipment().getRcDocNumber() : booking.getRcDocumentUrl())")
+    @Mapping(target = "insuranceDocumentUrl", expression = "java(booking.getEquipment() != null && booking.getEquipment().getInsuranceDocNumber() != null ? booking.getEquipment().getInsuranceDocNumber() : booking.getInsuranceDocumentUrl())")
+    @Mapping(target = "fitnessCertificateUrl", expression = "java(booking.getEquipment() != null && booking.getEquipment().getFitnessDocNumber() != null ? booking.getEquipment().getFitnessDocNumber() : booking.getFitnessCertificateUrl())")
+    @Mapping(target = "operatorLicenseUrl", expression = "java(booking.getEquipment() != null && booking.getEquipment().getOperatorLicenseNumber() != null ? booking.getEquipment().getOperatorLicenseNumber() : booking.getOperatorLicenseUrl())")
     BookingSummaryResponse toSummaryResponse(Booking booking);
 
     List<BookingSummaryResponse> toSummaryResponses(List<Booking> bookings);

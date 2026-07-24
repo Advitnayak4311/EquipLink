@@ -23,6 +23,7 @@ public record BookingSummaryResponse(
         BookingStatus status,
         VerificationStatus verificationStatus,
         String videoCallRoomId,
+        String inspectionVideoUrl,
         String rcDocumentUrl,
         String insuranceDocumentUrl,
         String fitnessCertificateUrl,

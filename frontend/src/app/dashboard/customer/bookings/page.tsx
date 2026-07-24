@@ -230,7 +230,7 @@ export default function CustomerBookingsPage() {
                 onOpenChange={setVideoModalOpen}
                 bookingId={selectedBooking.id}
                 equipmentName={selectedBooking.equipmentName}
-                videoCallRoomId={selectedBooking.videoCallRoomId}
+                videoUrl={selectedBooking.inspectionVideoUrl}
                 isVerified={selectedBooking.verificationStatus === "VIDEO_VERIFIED" || selectedBooking.verificationStatus === "FULLY_VERIFIED"}
                 onVerifySuccess={handleVerifyVideoSuccess}
               />
@@ -239,6 +239,10 @@ export default function CustomerBookingsPage() {
                 onOpenChange={setDocModalOpen}
                 bookingId={selectedBooking.id}
                 equipmentName={selectedBooking.equipmentName}
+                rcUrl={selectedBooking.rcDocumentUrl}
+                insuranceUrl={selectedBooking.insuranceDocumentUrl}
+                fitnessUrl={selectedBooking.fitnessCertificateUrl}
+                licenseUrl={selectedBooking.operatorLicenseUrl}
                 isVerified={selectedBooking.verificationStatus === "DOCUMENTS_VERIFIED" || selectedBooking.verificationStatus === "FULLY_VERIFIED"}
                 onVerifySuccess={handleVerifyDocSuccess}
               />
