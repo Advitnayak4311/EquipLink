@@ -279,6 +279,3 @@ export default function CustomerBookingsPage() {
     </div>
   );
 }
-
-// Helper to make Next.js build compile cleanly since Link is used in return
-import Link from "next/link";
