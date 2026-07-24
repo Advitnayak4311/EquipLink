@@ -140,6 +140,7 @@ export const equipmentApi = {
         headers: {
           "Content-Type": "multipart/form-data",
         },
+        timeout: 600000, // 10 minutes timeout for 300MB video uploads
       }
     );
     return response.data.data.toString();

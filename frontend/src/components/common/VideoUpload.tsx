@@ -45,8 +45,10 @@ export default function VideoUpload({ value = "", onChange }: VideoUploadProps) 
       onChange(uploadedUrl);
       setUrlInput(uploadedUrl);
       toast.success("Walkthrough video uploaded successfully!");
-    } catch {
-      toast.error("Failed to upload video file. Please try again or paste a video URL.");
+    } catch (err: any) {
+      console.error("Video upload error:", err);
+      const msg = err?.response?.data?.message || err?.message || "Failed to upload video file. Please try again or paste a video URL.";
+      toast.error(msg);
     } finally {
       setUploading(false);
     }
