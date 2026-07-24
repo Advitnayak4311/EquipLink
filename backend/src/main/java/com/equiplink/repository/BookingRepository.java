@@ -2,6 +2,8 @@ package com.equiplink.repository;
 
 import com.equiplink.entity.Booking;
 import com.equiplink.entity.enums.BookingStatus;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
@@ -46,4 +48,12 @@ public interface BookingRepository extends JpaRepository<Booking, Long>, JpaSpec
     long countByCustomerEmailIgnoreCaseAndStatus(@Param("email") String email, @Param("status") BookingStatus status);
 
     long countByStatus(BookingStatus status);
+
+    @Query(value = "SELECT DISTINCT b FROM Booking b LEFT JOIN FETCH b.equipment LEFT JOIN FETCH b.customer WHERE LOWER(b.equipment.owner.email) = LOWER(:email)",
+           countQuery = "SELECT COUNT(b) FROM Booking b WHERE LOWER(b.equipment.owner.email) = LOWER(:email)")
+    Page<Booking> findOwnerBookings(@Param("email") String email, Pageable pageable);
+
+    @Query(value = "SELECT DISTINCT b FROM Booking b LEFT JOIN FETCH b.equipment LEFT JOIN FETCH b.customer WHERE LOWER(b.customer.email) = LOWER(:email)",
+           countQuery = "SELECT COUNT(b) FROM Booking b WHERE LOWER(b.customer.email) = LOWER(:email)")
+    Page<Booking> findCustomerBookings(@Param("email") String email, Pageable pageable);
 }

@@ -18,6 +18,7 @@ import com.equiplink.repository.WishlistRepository;
 import com.equiplink.service.DashboardService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
@@ -50,120 +51,146 @@ public class DashboardServiceImpl implements DashboardService {
     @Override
     @Transactional(readOnly = true)
     public AdminDashboardResponse getAdminDashboard() {
-        long totalUsers = userRepository.count();
-        long totalOwners = userRepository.countByRole(UserRole.OWNER);
-        long totalCustomers = userRepository.countByRole(UserRole.CUSTOMER);
+        try {
+            long totalUsers = userRepository.count();
+            long totalOwners = userRepository.countByRole(UserRole.OWNER);
+            long totalCustomers = userRepository.countByRole(UserRole.CUSTOMER);
 
-        long totalEquipment = equipmentRepository.count();
-        long availableEquipment = equipmentRepository.countByAvailabilityStatus(EquipmentStatus.AVAILABLE);
-        long bookedEquipment = equipmentRepository.countByAvailabilityStatus(EquipmentStatus.BOOKED);
-        long pendingBookings = bookingRepository.countByStatus(BookingStatus.PENDING);
+            long totalEquipment = equipmentRepository.count();
+            long availableEquipment = equipmentRepository.countByAvailabilityStatus(EquipmentStatus.AVAILABLE);
+            long bookedEquipment = equipmentRepository.countByAvailabilityStatus(EquipmentStatus.BOOKED);
+            long pendingBookings = bookingRepository.countByStatus(BookingStatus.PENDING);
 
-        // Recent listings
-        List<User> recentUsersEntity = userRepository.findAll(
-                PageRequest.of(0, 5, Sort.by(Sort.Direction.DESC, "createdAt"))).getContent();
-        List<UserResponse> recentUsers = recentUsersEntity.stream()
-                .map(userMapper::toResponse)
-                .collect(Collectors.toList());
+            // Recent listings
+            List<User> recentUsersEntity = userRepository.findAll(
+                    PageRequest.of(0, 5, Sort.by(Sort.Direction.DESC, "createdAt"))).getContent();
+            List<UserResponse> recentUsers = recentUsersEntity.stream()
+                    .map(userMapper::toResponse)
+                    .collect(Collectors.toList());
 
-        List<Equipment> recentEquipEntity = equipmentRepository.findAll(
-                PageRequest.of(0, 5, Sort.by(Sort.Direction.DESC, "createdAt"))).getContent();
-        List<EquipmentSummaryResponse> recentEquipment = equipmentMapper.toSummaryResponses(recentEquipEntity);
+            Page<Equipment> recentEquipPage = equipmentRepository.findAllEquipment(
+                    null, null, null, PageRequest.of(0, 5, Sort.by(Sort.Direction.DESC, "createdAt"))
+            );
+            List<EquipmentSummaryResponse> recentEquipment = equipmentMapper.toSummaryResponses(recentEquipPage.getContent());
 
-        List<Booking> recentBookingsEntity = bookingRepository.findAll(
-                PageRequest.of(0, 5, Sort.by(Sort.Direction.DESC, "createdAt"))).getContent();
-        List<BookingSummaryResponse> recentBookings = bookingMapper.toSummaryResponses(recentBookingsEntity);
+            List<Booking> recentBookingsEntity = bookingRepository.findAll(
+                    PageRequest.of(0, 5, Sort.by(Sort.Direction.DESC, "createdAt"))).getContent();
+            List<BookingSummaryResponse> recentBookings = bookingMapper.toSummaryResponses(recentBookingsEntity);
 
-        // Category distribution (Admin chart)
-        Map<String, Long> categoryMap = new LinkedHashMap<>();
-        List<Object[]> categoryCounts = equipmentRepository.countEquipmentByCategory();
-        for (Object[] row : categoryCounts) {
-            categoryMap.put((String) row[0], (Long) row[1]);
+            // Category distribution (Admin chart)
+            Map<String, Long> categoryMap = new LinkedHashMap<>();
+            List<Object[]> categoryCounts = equipmentRepository.countEquipmentByCategory();
+            for (Object[] row : categoryCounts) {
+                categoryMap.put((String) row[0], (Long) row[1]);
+            }
+
+            // Booking status distribution (Admin chart)
+            Map<String, Long> statusMap = new HashMap<>();
+            for (BookingStatus status : BookingStatus.values()) {
+                statusMap.put(status.name(), bookingRepository.countByStatus(status));
+            }
+
+            return new AdminDashboardResponse(
+                    totalUsers, totalOwners, totalCustomers,
+                    totalEquipment, availableEquipment, bookedEquipment, pendingBookings,
+                    recentUsers, recentEquipment, recentBookings,
+                    categoryMap, statusMap
+            );
+        } catch (Exception e) {
+            log.error("Failed to compile admin dashboard: {}", e.getMessage(), e);
+            return new AdminDashboardResponse(
+                    0L, 0L, 0L, 0L, 0L, 0L, 0L,
+                    List.of(), List.of(), List.of(),
+                    Map.of(), Map.of()
+            );
         }
-
-        // Booking status distribution (Admin chart)
-        Map<String, Long> statusMap = new HashMap<>();
-        for (BookingStatus status : BookingStatus.values()) {
-            statusMap.put(status.name(), bookingRepository.countByStatus(status));
-        }
-
-        return new AdminDashboardResponse(
-                totalUsers, totalOwners, totalCustomers,
-                totalEquipment, availableEquipment, bookedEquipment, pendingBookings,
-                recentUsers, recentEquipment, recentBookings,
-                categoryMap, statusMap
-        );
     }
 
     @Override
     @Transactional(readOnly = true)
     public OwnerDashboardResponse getOwnerDashboard(String ownerEmail) {
-        String cleanEmail = ownerEmail != null ? ownerEmail.trim().toLowerCase() : "";
-        long totalEquipment = equipmentRepository.countByOwnerEmailIgnoreCase(cleanEmail);
-        long availableEquipment = equipmentRepository.countByOwnerEmailAndAvailabilityStatusIgnoreCase(cleanEmail, EquipmentStatus.AVAILABLE);
-        long bookedEquipment = equipmentRepository.countByOwnerEmailAndAvailabilityStatusIgnoreCase(cleanEmail, EquipmentStatus.BOOKED);
-        long pendingBookings = bookingRepository.countByEquipmentOwnerEmailIgnoreCaseAndStatus(cleanEmail, BookingStatus.PENDING);
+        try {
+            String cleanEmail = ownerEmail != null ? ownerEmail.trim().toLowerCase() : "";
+            long totalEquipment = equipmentRepository.countByOwnerEmailIgnoreCase(cleanEmail);
+            long availableEquipment = equipmentRepository.countByOwnerEmailAndAvailabilityStatusIgnoreCase(cleanEmail, EquipmentStatus.AVAILABLE);
+            long bookedEquipment = equipmentRepository.countByOwnerEmailAndAvailabilityStatusIgnoreCase(cleanEmail, EquipmentStatus.BOOKED);
+            long pendingBookings = bookingRepository.countByEquipmentOwnerEmailIgnoreCaseAndStatus(cleanEmail, BookingStatus.PENDING);
 
-        // Recent owner listed items
-        List<Equipment> myEquip = equipmentRepository.findAll(
-                (root, query, cb) -> cb.equal(cb.lower(root.get("owner").get("email")), cleanEmail),
-                PageRequest.of(0, 5, Sort.by(Sort.Direction.DESC, "createdAt"))
-        ).getContent();
-        List<EquipmentSummaryResponse> recentEquipment = equipmentMapper.toSummaryResponses(myEquip);
+            // Recent owner listed items
+            Page<Equipment> myEquipPage = equipmentRepository.findMyEquipment(
+                    cleanEmail, null, null, null,
+                    PageRequest.of(0, 5, Sort.by(Sort.Direction.DESC, "createdAt"))
+            );
+            List<EquipmentSummaryResponse> recentEquipment = equipmentMapper.toSummaryResponses(myEquipPage.getContent());
 
-        // Recent incoming booking requests
-        List<Booking> incomingBookings = bookingRepository.findAll(
-                (root, query, cb) -> cb.equal(cb.lower(root.get("equipment").get("owner").get("email")), cleanEmail),
-                PageRequest.of(0, 5, Sort.by(Sort.Direction.DESC, "createdAt"))
-        ).getContent();
-        List<BookingSummaryResponse> recentBookings = bookingMapper.toSummaryResponses(incomingBookings);
+            // Recent incoming booking requests
+            Page<Booking> incomingBookingsPage = bookingRepository.findOwnerBookings(
+                    cleanEmail,
+                    PageRequest.of(0, 5, Sort.by(Sort.Direction.DESC, "createdAt"))
+            );
+            List<BookingSummaryResponse> recentBookings = bookingMapper.toSummaryResponses(incomingBookingsPage.getContent());
 
-        // Monthly bookings chart (Owner chart)
-        List<Booking> allOwnerBookings = bookingRepository.findAll(
-                (root, query, cb) -> cb.equal(cb.lower(root.get("equipment").get("owner").get("email")), cleanEmail)
-        );
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMM yyyy");
-        Map<String, Long> bookingsPerMonth = allOwnerBookings.stream()
-                .filter(b -> b.getCreatedAt() != null)
-                .collect(Collectors.groupingBy(
-                        b -> b.getCreatedAt().format(formatter),
-                        LinkedHashMap::new,
-                        Collectors.counting()
-                ));
+            // Monthly bookings chart (Owner chart)
+            Page<Booking> allOwnerBookingsPage = bookingRepository.findOwnerBookings(
+                    cleanEmail, PageRequest.of(0, 1000)
+            );
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMM yyyy");
+            Map<String, Long> bookingsPerMonth = allOwnerBookingsPage.getContent().stream()
+                    .filter(b -> b.getCreatedAt() != null)
+                    .collect(Collectors.groupingBy(
+                            b -> b.getCreatedAt().format(formatter),
+                            LinkedHashMap::new,
+                            Collectors.counting()
+                    ));
 
-        return new OwnerDashboardResponse(
-                totalEquipment, availableEquipment, bookedEquipment, pendingBookings,
-                recentEquipment, recentBookings, bookingsPerMonth
-        );
+            return new OwnerDashboardResponse(
+                    totalEquipment, availableEquipment, bookedEquipment, pendingBookings,
+                    recentEquipment, recentBookings, bookingsPerMonth
+            );
+        } catch (Exception e) {
+            log.error("Failed to compile owner dashboard for {}: {}", ownerEmail, e.getMessage(), e);
+            return new OwnerDashboardResponse(
+                    0L, 0L, 0L, 0L,
+                    List.of(), List.of(), Map.of()
+            );
+        }
     }
 
     @Override
     @Transactional(readOnly = true)
     public CustomerDashboardResponse getCustomerDashboard(String customerEmail) {
-        String cleanEmail = customerEmail != null ? customerEmail.trim().toLowerCase() : "";
-        long totalBookings = bookingRepository.countByCustomerEmailIgnoreCase(cleanEmail);
-        long approvedBookings = bookingRepository.countByCustomerEmailIgnoreCaseAndStatus(cleanEmail, BookingStatus.APPROVED);
-        long pendingBookings = bookingRepository.countByCustomerEmailIgnoreCaseAndStatus(cleanEmail, BookingStatus.PENDING);
-        long wishlistCount = wishlistRepository.countByCustomerEmail(cleanEmail);
+        try {
+            String cleanEmail = customerEmail != null ? customerEmail.trim().toLowerCase() : "";
+            long totalBookings = bookingRepository.countByCustomerEmailIgnoreCase(cleanEmail);
+            long approvedBookings = bookingRepository.countByCustomerEmailIgnoreCaseAndStatus(cleanEmail, BookingStatus.APPROVED);
+            long pendingBookings = bookingRepository.countByCustomerEmailIgnoreCaseAndStatus(cleanEmail, BookingStatus.PENDING);
+            long wishlistCount = wishlistRepository.countByCustomerEmail(cleanEmail);
 
-        // Recent customer bookings
-        List<Booking> myBookings = bookingRepository.findAll(
-                (root, query, cb) -> cb.equal(cb.lower(root.get("customer").get("email")), cleanEmail),
-                PageRequest.of(0, 5, Sort.by(Sort.Direction.DESC, "createdAt"))
-        ).getContent();
-        List<BookingSummaryResponse> recentBookings = bookingMapper.toSummaryResponses(myBookings);
+            // Recent customer bookings
+            Page<Booking> myBookingsPage = bookingRepository.findCustomerBookings(
+                    cleanEmail,
+                    PageRequest.of(0, 5, Sort.by(Sort.Direction.DESC, "createdAt"))
+            );
+            List<BookingSummaryResponse> recentBookings = bookingMapper.toSummaryResponses(myBookingsPage.getContent());
 
-        // Recent saved wishlist items
-        List<Wishlist> myWishlist = wishlistRepository.findByCustomerEmail(
-                cleanEmail, PageRequest.of(0, 5, Sort.by(Sort.Direction.DESC, "createdAt"))
-        );
-        List<EquipmentSummaryResponse> recentWishlist = myWishlist.stream()
-                .map(w -> equipmentMapper.toSummaryResponse(w.getEquipment()))
-                .collect(Collectors.toList());
+            // Recent saved wishlist items
+            List<Wishlist> myWishlist = wishlistRepository.findByCustomerEmail(
+                    cleanEmail, PageRequest.of(0, 5, Sort.by(Sort.Direction.DESC, "createdAt"))
+            );
+            List<EquipmentSummaryResponse> recentWishlist = myWishlist.stream()
+                    .map(w -> equipmentMapper.toSummaryResponse(w.getEquipment()))
+                    .collect(Collectors.toList());
 
-        return new CustomerDashboardResponse(
-                totalBookings, approvedBookings, pendingBookings, wishlistCount,
-                recentBookings, recentWishlist
-        );
+            return new CustomerDashboardResponse(
+                    totalBookings, approvedBookings, pendingBookings, wishlistCount,
+                    recentBookings, recentWishlist
+            );
+        } catch (Exception e) {
+            log.error("Failed to compile customer dashboard for {}: {}", customerEmail, e.getMessage(), e);
+            return new CustomerDashboardResponse(
+                    0L, 0L, 0L, 0L,
+                    List.of(), List.of()
+            );
+        }
     }
 }
