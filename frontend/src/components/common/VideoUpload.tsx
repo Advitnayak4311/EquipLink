@@ -34,8 +34,8 @@ export default function VideoUpload({ value = "", onChange }: VideoUploadProps) 
       toast.error("Please select a valid video file (MP4, WebM, MOV).");
       return;
     }
-    if (file.size > 50 * 1024 * 1024) {
-      toast.error(`${file.name} exceeds the 50MB size limit.`);
+    if (file.size > 300 * 1024 * 1024) {
+      toast.error(`${file.name} exceeds the 300MB size limit.`);
       return;
     }
 
@@ -121,7 +121,7 @@ export default function VideoUpload({ value = "", onChange }: VideoUploadProps) 
                   </div>
                   <div>
                     <p className="text-xs font-bold text-foreground">Click or Drag & Drop Video File</p>
-                    <p className="text-[10px] text-muted-foreground">Supports MP4, WebM, MOV up to 50MB</p>
+                    <p className="text-[10px] text-muted-foreground">Supports MP4, WebM, MOV up to 300MB</p>
                   </div>
                 </div>
               )}
