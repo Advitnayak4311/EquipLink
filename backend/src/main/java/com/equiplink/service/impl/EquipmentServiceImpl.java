@@ -230,10 +230,11 @@ public class EquipmentServiceImpl implements EquipmentService {
     @Override
     @Transactional(readOnly = true)
     public Map<String, Long> getOwnerDashboardStats(String ownerEmail) {
+        String cleanEmail = ownerEmail != null ? ownerEmail.trim().toLowerCase() : "";
         Map<String, Long> stats = new HashMap<>();
-        stats.put("total", equipmentRepository.countByOwnerEmail(ownerEmail));
-        stats.put("available", equipmentRepository.countByOwnerEmailAndAvailabilityStatus(ownerEmail, EquipmentStatus.AVAILABLE));
-        stats.put("booked", equipmentRepository.countByOwnerEmailAndAvailabilityStatus(ownerEmail, EquipmentStatus.BOOKED));
+        stats.put("total", equipmentRepository.countByOwnerEmailIgnoreCase(cleanEmail));
+        stats.put("available", equipmentRepository.countByOwnerEmailAndAvailabilityStatusIgnoreCase(cleanEmail, EquipmentStatus.AVAILABLE));
+        stats.put("booked", equipmentRepository.countByOwnerEmailAndAvailabilityStatusIgnoreCase(cleanEmail, EquipmentStatus.BOOKED));
         return stats;
     }
 
