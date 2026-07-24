@@ -5,8 +5,7 @@ import { useState } from "react";
 
 /**
  * TanStack Query provider.
- * Creating the QueryClient inside the component (with useState) ensures
- * each user session gets a fresh client, avoiding state leakage.
+ * Optimized caching settings for ultra-fast, smooth navigation.
  */
 export function QueryProvider({ children }: { children: React.ReactNode }) {
   const [queryClient] = useState(
@@ -14,7 +13,10 @@ export function QueryProvider({ children }: { children: React.ReactNode }) {
       new QueryClient({
         defaultOptions: {
           queries: {
-            staleTime: 60 * 1000, // 1 minute
+            staleTime: 5 * 60 * 1000, // 5 minutes cache
+            gcTime: 10 * 60 * 1000, // Keep inactive cache for 10 mins
+            refetchOnWindowFocus: false, // Prevent aggressive re-querying on tab focus
+            refetchOnReconnect: false,
             retry: 1,
           },
         },

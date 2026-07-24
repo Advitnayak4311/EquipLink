@@ -172,3 +172,17 @@
   background-image: radial-gradient(rgba(245, 158, 11, 0.12) 1px, transparent 1px);
   background-size: 24px 24px;
 }
+
+/* ---- Hardware Acceleration & Ultra-Fast Smooth Performance ---- */
+html {
+  scroll-behavior: smooth;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+button, a, input, select, textarea, [role="button"] {
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  transform: translateZ(0);
+}
