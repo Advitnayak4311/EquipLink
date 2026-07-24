@@ -11,7 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
-import { Loader2, Sparkles, AlertTriangle, AlertCircle, CheckCircle, Info, Zap } from "lucide-react";
+import { Loader2, Sparkles, AlertTriangle, AlertCircle, CheckCircle, Info, Zap, Video } from "lucide-react";
 import ImageUpload from "./ImageUpload";
 import { EquipmentStatus } from "@/types";
 import { useGenerateDescription, useAnalyzeListing, ListingAnalysisResponse } from "@/lib/api/aiService";
