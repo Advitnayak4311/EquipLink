@@ -13,6 +13,7 @@ import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Loader2, Sparkles, AlertTriangle, AlertCircle, CheckCircle, Info, Zap, Video } from "lucide-react";
 import ImageUpload from "./ImageUpload";
+import VideoUpload from "./VideoUpload";
 import { EquipmentStatus } from "@/types";
 import { useGenerateDescription, useAnalyzeListing, ListingAnalysisResponse } from "@/lib/api/aiService";
 
@@ -416,15 +417,18 @@ ${res.safetyNotes}`;
         </p>
 
         <div className="space-y-1.5">
-          <Label htmlFor="inspectionVideoUrl" className="text-xs font-semibold text-foreground">
-            Detailed Vehicle Inspection Video (MP4 Walkthrough / URL)
+          <Label className="text-xs font-semibold text-foreground">
+            Detailed Vehicle Inspection Video (Upload Video File / External URL)
           </Label>
-          <Input
-            id="inspectionVideoUrl"
-            type="text"
-            placeholder="e.g. https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4 or video link"
-            className="bg-background border-input text-foreground text-sm"
-            {...register("inspectionVideoUrl")}
+          <Controller
+            name="inspectionVideoUrl"
+            control={control}
+            render={({ field }) => (
+              <VideoUpload
+                value={field.value || ""}
+                onChange={(val) => field.onChange(val)}
+              />
+            )}
           />
         </div>
 
