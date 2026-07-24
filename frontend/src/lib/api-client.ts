@@ -70,7 +70,7 @@ apiClient.interceptors.response.use(
         if (typeof window !== "undefined") {
           window.dispatchEvent(new Event("auth_session_expired"));
         }
-        return Promise.reject(refreshError);
+        return Promise.reject(error);
       }
     }
 

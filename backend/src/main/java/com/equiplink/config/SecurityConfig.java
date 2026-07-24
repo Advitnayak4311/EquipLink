@@ -50,7 +50,8 @@ public class SecurityConfig {
             "/uploads/**",
             "/api/categories",
             "/api/marketplace/**",
-            "/api/ai/**"
+            "/api/ai/**",
+            "/api/equipment/upload"
     };
 
     @Bean
