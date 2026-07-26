@@ -15,8 +15,12 @@ services:
     envVars:
       - key: SPRING_PROFILES_ACTIVE
         value: prod
-      - key: DATABASE_URL
-        value: jdbc:postgresql://neondb_owner:npg_BTC98mHSoqUp@ep-purple-base-ax3jjy38.c-4.us-east-2.aws.neon.tech/neondb?sslmode=require
+      - key: SPRING_DATASOURCE_URL
+        value: jdbc:postgresql://ep-purple-base-ax3jjy38.c-4.us-east-2.aws.neon.tech/neondb?sslmode=require
+      - key: SPRING_DATASOURCE_USERNAME
+        value: neondb_owner
+      - key: SPRING_DATASOURCE_PASSWORD
+        value: npg_BTC98mHSoqUp
       - key: JWT_SECRET
         generateValue: true
       - key: CORS_ALLOWED_ORIGIN
