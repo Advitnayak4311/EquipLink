@@ -9,7 +9,7 @@ services:
     name: equiplink-backend
     runtime: docker
     dockerfilePath: docker/Dockerfile.backend
-    context: backend
+    dockerContext: backend
     plan: free
     region: singapore
     envVars:
@@ -32,7 +32,7 @@ services:
     name: equiplink-frontend
     runtime: docker
     dockerfilePath: docker/Dockerfile.frontend
-    context: frontend
+    dockerContext: frontend
     plan: free
     region: singapore
     envVars:
