@@ -26,6 +26,16 @@ const apiClient = axios.create({
   },
 });
 
+// Dynamic request interceptor to guarantee correct production backend URL in browser
+apiClient.interceptors.request.use((config) => {
+  if (typeof window !== "undefined") {
+    if (window.location.hostname.includes("onrender.com")) {
+      config.baseURL = "https://equiplink-backend.onrender.com/api";
+    }
+  }
+  return config;
+});
+
 let isRefreshing = false;
 let failedQueue: Array<{
   resolve: (value: unknown) => void;
