@@ -28,13 +28,8 @@ public class CorsConfig {
     public CorsFilter corsFilter() {
         CorsConfiguration config = new CorsConfiguration();
 
-        // Allow the frontend origin (Vercel/Render in prod, localhost in dev)
-        String origin = allowedOrigin;
-        if (origin != null && !origin.isBlank() && !origin.startsWith("http://") && !origin.startsWith("https://")) {
-            config.setAllowedOrigins(List.of("https://" + origin, "http://" + origin, origin));
-        } else {
-            config.setAllowedOrigins(List.of(allowedOrigin));
-        }
+        // Allow frontend origins (Render, Vercel, localhost)
+        config.setAllowedOriginPatterns(List.of("http://localhost:*", "http://127.0.0.1:*", "https://*.onrender.com", "https://*.vercel.app", "https://*"));
 
         // Required for HttpOnly cookies to be sent/received cross-origin
         config.setAllowCredentials(true);
