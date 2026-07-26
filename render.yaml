@@ -19,6 +19,14 @@ services:
         fromDatabase:
           name: equiplink-postgres
           property: connectionString
+      - key: DATABASE_USERNAME
+        fromDatabase:
+          name: equiplink-postgres
+          property: user
+      - key: DATABASE_PASSWORD
+        fromDatabase:
+          name: equiplink-postgres
+          property: password
       - key: JWT_SECRET
         generateValue: true
       - key: CORS_ALLOWED_ORIGIN
