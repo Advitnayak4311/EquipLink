@@ -69,9 +69,9 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(response);
     }
 
-    // ---- Illegal arguments ----
-    @ExceptionHandler(IllegalArgumentException.class)
-    public ResponseEntity<BaseResponse<Object>> handleIllegalArgument(IllegalArgumentException ex) {
+    // ---- Illegal arguments and state ----
+    @ExceptionHandler({IllegalArgumentException.class, IllegalStateException.class})
+    public ResponseEntity<BaseResponse<Object>> handleIllegalArgumentAndState(RuntimeException ex) {
         BaseResponse<Object> response = BaseResponse.error(HttpStatus.BAD_REQUEST.value(), ex.getMessage());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
     }
@@ -82,7 +82,7 @@ public class GlobalExceptionHandler {
         log.error("Unhandled exception: {}", ex.getMessage(), ex);
         BaseResponse<Object> response = BaseResponse.error(
                 HttpStatus.INTERNAL_SERVER_ERROR.value(),
-                "An unexpected error occurred. Please try again later."
+                ex.getMessage() != null ? ex.getMessage() : "An unexpected error occurred. Please try again later."
         );
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
     }

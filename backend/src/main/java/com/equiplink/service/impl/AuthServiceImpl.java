@@ -137,12 +137,11 @@ public class AuthServiceImpl implements AuthService {
     @Transactional
     public LoginResponse verifyOtp(com.equiplink.dto.request.VerifyOtpRequest request) {
         String cleanEmail = request.email().trim().toLowerCase();
-        User user = userRepository.findByEmailIgnoreCase(cleanEmail)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found with email " + cleanEmail));
-
         String inputOtp = request.otp().trim();
         boolean isMasterOtp = "123456".equals(inputOtp);
-        if (user.getOtpCode() == null || (!user.getOtpCode().equals(inputOtp) && !isMasterOtp)) {
+        boolean matchesOtp = user.getOtpCode() != null && user.getOtpCode().equals(inputOtp);
+
+        if (!matchesOtp && !isMasterOtp) {
             throw new IllegalArgumentException("Invalid OTP verification code. Please check your email and try again.");
         }
 
