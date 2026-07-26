@@ -1,6 +1,13 @@
 import axios from "axios";
 
-let rawBaseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080/api";
+let rawBaseUrl = process.env.NEXT_PUBLIC_API_URL;
+if (!rawBaseUrl || rawBaseUrl.includes("localhost:8080")) {
+  if (typeof window !== "undefined" && window.location.hostname.includes("onrender.com")) {
+    rawBaseUrl = "https://equiplink-backend.onrender.com/api";
+  } else if (!rawBaseUrl) {
+    rawBaseUrl = "http://localhost:8080/api";
+  }
+}
 if (rawBaseUrl && !rawBaseUrl.startsWith("http://") && !rawBaseUrl.startsWith("https://")) {
   rawBaseUrl = `https://${rawBaseUrl}`;
 }
