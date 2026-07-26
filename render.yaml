@@ -15,26 +15,8 @@ services:
     envVars:
       - key: SPRING_PROFILES_ACTIVE
         value: prod
-      - key: DATABASE_HOST
-        fromDatabase:
-          name: equiplink-postgres
-          property: host
-      - key: DATABASE_PORT
-        fromDatabase:
-          name: equiplink-postgres
-          property: port
-      - key: DATABASE_NAME
-        fromDatabase:
-          name: equiplink-postgres
-          property: database
-      - key: DATABASE_USERNAME
-        fromDatabase:
-          name: equiplink-postgres
-          property: user
-      - key: DATABASE_PASSWORD
-        fromDatabase:
-          name: equiplink-postgres
-          property: password
+      - key: DATABASE_URL
+        value: jdbc:postgresql://neondb_owner:npg_BTC98mHSoqUp@ep-purple-base-ax3jjy38.c-4.us-east-2.aws.neon.tech/neondb?sslmode=require
       - key: JWT_SECRET
         generateValue: true
       - key: CORS_ALLOWED_ORIGIN
@@ -57,11 +39,3 @@ services:
           type: web
           name: equiplink-backend
           property: host
-
-databases:
-  # ---- PostgreSQL Database (Neon / Render Postgres) ----
-  - name: equiplink-postgres
-    databaseName: equiplink
-    user: equiplink_user
-    plan: free
-    region: singapore

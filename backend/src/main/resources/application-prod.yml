@@ -4,9 +4,7 @@
 
 spring:
   datasource:
-    url: jdbc:postgresql://${DATABASE_HOST:localhost}:${DATABASE_PORT:5432}/${DATABASE_NAME:equiplink}
-    username: ${DATABASE_USERNAME:equiplink_user}
-    password: ${DATABASE_PASSWORD:localpassword}
+    url: ${DATABASE_URL:jdbc:postgresql://neondb_owner:npg_BTC98mHSoqUp@ep-purple-base-ax3jjy38.c-4.us-east-2.aws.neon.tech/neondb?sslmode=require}
     driver-class-name: org.postgresql.Driver
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
