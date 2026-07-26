@@ -76,8 +76,8 @@ export default function EquipmentForm({
     setValue,
     watch,
     formState: { errors },
-  } = useForm<EquipmentFormValues>({
-    resolver: zodResolver(equipmentFormSchema),
+  } = useForm({
+    resolver: zodResolver(equipmentFormSchema) as any,
     defaultValues: {
       name: "",
       brand: "",
@@ -180,9 +180,9 @@ ${res.safetyNotes}`;
     }
   };
 
-  const onFormSubmit = async (data: EquipmentFormValues) => {
+  const onFormSubmit = async (data: any) => {
     try {
-      await onSubmit(data);
+      await onSubmit(data as EquipmentFormValues);
     } catch (err: any) {
       const message = err?.response?.data?.message || "Operation failed. Please try again.";
       toast.error(message);

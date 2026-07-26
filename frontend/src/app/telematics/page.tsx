@@ -37,7 +37,7 @@ export default function TelematicsPage() {
     name: eq.name,
     owner: eq.location ? `${eq.location} Yard` : "Verified Owner Yard",
     jobsite: eq.location ? `${eq.location} Site` : "Active Project Site",
-    status: eq.available ? "OPERATIONAL" : "DEPLOYED_ACTIVE",
+    status: eq.availabilityStatus === "AVAILABLE" ? "OPERATIONAL" : "DEPLOYED_ACTIVE",
     rpm: 1850,
     oilTemp: "85°C",
     fuelLevel: "82%",
