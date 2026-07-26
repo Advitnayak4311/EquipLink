@@ -1,10 +1,18 @@
 import axios from "axios";
 
+let rawBaseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080/api";
+if (rawBaseUrl && !rawBaseUrl.startsWith("http://") && !rawBaseUrl.startsWith("https://")) {
+  rawBaseUrl = `https://${rawBaseUrl}`;
+}
+if (rawBaseUrl && !rawBaseUrl.endsWith("/api")) {
+  rawBaseUrl = `${rawBaseUrl.replace(/\/$/, "")}/api`;
+}
+
 /**
  * Pre-configured Axios instance for all EquipLink API calls.
  */
 const apiClient = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080/api",
+  baseURL: rawBaseUrl,
   withCredentials: true,
   headers: {
     "Content-Type": "application/json",
