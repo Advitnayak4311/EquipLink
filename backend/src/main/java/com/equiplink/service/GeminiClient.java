@@ -17,17 +17,16 @@ import java.util.Map;
  * Service client communicating with Google Gemini AI API via Spring RestTemplate.
  */
 @Component
-@RequiredArgsConstructor
 @Slf4j
 public class GeminiClient {
 
-    @Value("${app.gemini.base-url}")
+    @Value("${app.gemini.base-url:https://generativelanguage.googleapis.com/v1beta}")
     private String baseUrl;
 
     @Value("${app.gemini.api-key:}")
     private String apiKey;
 
-    private final RestTemplate restTemplate = new RestTemplate();
+    private RestTemplate restTemplate = new RestTemplate();
 
     public boolean hasApiKey() {
         return apiKey != null && !apiKey.trim().isEmpty();
