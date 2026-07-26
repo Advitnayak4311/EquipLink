@@ -78,7 +78,6 @@ export default function VideoUpload({ value = "", onChange }: VideoUploadProps) 
             src={displayUrl}
             controls
             className="w-full h-48 object-cover"
-            poster="https://images.unsplash.com/photo-1579621970563-ebec7560ff3e?q=80&w=800&auto=format&fit=crop"
           />
           <div className="absolute top-3 left-3 bg-background/90 backdrop-blur-md px-3 py-1 rounded-full border shadow-xs text-xs font-semibold text-foreground flex items-center gap-1.5">
             <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" />

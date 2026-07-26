@@ -51,6 +51,12 @@ public class AuthServiceImpl implements AuthService {
 
     private static final long REFRESH_TOKEN_VALIDITY_MS = 7 * 24 * 60 * 60 * 1000L; // 7 days
 
+    private String generate6DigitOtp() {
+        java.security.SecureRandom random = new java.security.SecureRandom();
+        int num = 100000 + random.nextInt(900000);
+        return String.valueOf(num);
+    }
+
     @Override
     @Transactional
     public LoginResponse register(RegistrationRequest request) {
@@ -64,6 +70,8 @@ public class AuthServiceImpl implements AuthService {
         }
 
         String verificationToken = UUID.randomUUID().toString();
+        String otpCode = generate6DigitOtp();
+
         User user = User.builder()
                 .firstName(request.firstName())
                 .lastName(request.lastName())
@@ -75,20 +83,21 @@ public class AuthServiceImpl implements AuthService {
                 .emailVerified(false)
                 .verificationToken(verificationToken)
                 .verificationTokenExpiry(LocalDateTime.now().plusDays(1))
+                .otpCode(otpCode)
+                .otpExpiry(LocalDateTime.now().plusMinutes(10))
                 .build();
 
         userRepository.save(user);
-        log.info("Successfully registered user and generated verification token: {}", user.getEmail());
+        log.info("Successfully registered user {} with 6-digit OTP [{}]", user.getEmail(), otpCode);
 
-        // Send email asynchronously/non-blocking
         try {
-            String verifyLink = frontendUrl + "/verify-email?token=" + verificationToken;
-            emailService.sendVerificationEmail(user, verifyLink);
+            emailService.sendOtpEmail(user, otpCode);
         } catch (Exception e) {
-            log.error("Failed to send verification email: {}", e.getMessage());
+            log.error("Failed to send OTP email: {}", e.getMessage());
         }
 
-        return createSessionResponse(user);
+        UserResponse userResponse = userMapper.toResponse(user);
+        return new LoginResponse("", "", userResponse);
     }
 
     @Override
@@ -102,10 +111,76 @@ public class AuthServiceImpl implements AuthService {
         User user = userRepository.findByEmailIgnoreCase(cleanEmail)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
+        if (Boolean.FALSE.equals(user.getEmailVerified())) {
+            String freshOtp = generate6DigitOtp();
+            user.setOtpCode(freshOtp);
+            user.setOtpExpiry(LocalDateTime.now().plusMinutes(10));
+            userRepository.save(user);
+            log.info("Unverified user {} logged in. Generated new OTP [{}]", user.getEmail(), freshOtp);
+
+            try {
+                emailService.sendOtpEmail(user, freshOtp);
+            } catch (Exception e) {
+                log.error("Failed to send OTP email on login: {}", e.getMessage());
+            }
+
+            throw new IllegalStateException("Email address is not verified yet. A 6-digit verification OTP has been sent to " + user.getEmail() + ". Please verify to complete login.");
+        }
+
         // Clean up old refresh tokens for this user
         refreshTokenRepository.deleteByUser(user);
 
         return createSessionResponse(user);
+    }
+
+    @Override
+    @Transactional
+    public LoginResponse verifyOtp(com.equiplink.dto.request.VerifyOtpRequest request) {
+        String cleanEmail = request.email().trim().toLowerCase();
+        User user = userRepository.findByEmailIgnoreCase(cleanEmail)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with email " + cleanEmail));
+
+        if (user.getOtpCode() == null || !user.getOtpCode().equals(request.otp().trim())) {
+            throw new IllegalArgumentException("Invalid OTP verification code. Please check your email and try again.");
+        }
+
+        if (user.getOtpExpiry() != null && user.getOtpExpiry().isBefore(LocalDateTime.now())) {
+            throw new IllegalStateException("OTP verification code has expired. Please click 'Resend OTP' to receive a new code.");
+        }
+
+        user.setEmailVerified(true);
+        user.setOtpCode(null);
+        user.setOtpExpiry(null);
+        userRepository.save(user);
+        log.info("Email verified successfully via 6-digit OTP for user: {}", user.getEmail());
+
+        try {
+            emailService.sendWelcomeEmail(user);
+        } catch (Exception e) {
+            log.error("Failed to send welcome email: {}", e.getMessage());
+        }
+
+        return createSessionResponse(user);
+    }
+
+    @Override
+    @Transactional
+    public void sendOtp(String email) {
+        String cleanEmail = email.trim().toLowerCase();
+        User user = userRepository.findByEmailIgnoreCase(cleanEmail)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+
+        String freshOtp = generate6DigitOtp();
+        user.setOtpCode(freshOtp);
+        user.setOtpExpiry(LocalDateTime.now().plusMinutes(10));
+        userRepository.save(user);
+        log.info("Generated fresh 6-digit OTP [{}] for user: {}", freshOtp, user.getEmail());
+
+        try {
+            emailService.sendOtpEmail(user, freshOtp);
+        } catch (Exception e) {
+            log.error("Failed to send OTP email: {}", e.getMessage());
+        }
     }
 
     @Override

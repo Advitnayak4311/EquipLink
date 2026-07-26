@@ -64,6 +64,12 @@ public class User {
     @Column(name = "reset_password_token_expiry")
     private java.time.LocalDateTime resetPasswordTokenExpiry;
 
+    @Column(name = "otp_code")
+    private String otpCode;
+
+    @Column(name = "otp_expiry")
+    private java.time.LocalDateTime otpExpiry;
+
     // ---- Optional B2B & Business Profile Fields ----
 
     @Column(name = "company_name")

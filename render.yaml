@@ -1,0 +1,52 @@
+# ============================================================
+#  EquipLink – Render Infrastructure as Code (Blueprint)
+#  Deploys Backend (Spring Boot), Frontend (Next.js), and Postgres
+# ============================================================
+
+services:
+  # ---- Backend Service (Spring Boot 3 / Java 21) ----
+  - type: web
+    name: equiplink-backend
+    runtime: docker
+    dockerfilePath: docker/Dockerfile.backend
+    context: backend
+    plan: free
+    region: singapore
+    envVars:
+      - key: SPRING_PROFILES_ACTIVE
+        value: prod
+      - key: DATABASE_URL
+        fromDatabase:
+          name: equiplink-postgres
+          property: connectionString
+      - key: JWT_SECRET
+        generateValue: true
+      - key: CORS_ALLOWED_ORIGIN
+        fromService:
+          type: web
+          name: equiplink-frontend
+          property: url
+
+  # ---- Frontend Service (Next.js 14+ App Router) ----
+  - type: web
+    name: equiplink-frontend
+    runtime: docker
+    dockerfilePath: docker/Dockerfile.frontend
+    context: frontend
+    plan: free
+    region: singapore
+    envVars:
+      - key: NEXT_PUBLIC_API_URL
+        fromService:
+          type: web
+          name: equiplink-backend
+          property: url
+          suffix: /api
+
+databases:
+  # ---- PostgreSQL Database (Neon / Render Postgres) ----
+  - name: equiplink-postgres
+    databaseName: equiplink
+    user: equiplink_user
+    plan: free
+    region: singapore

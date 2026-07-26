@@ -28,11 +28,15 @@ type LoginFormValues = z.infer<typeof loginSchema>;
 
 // ---- Component ----
 
+import VerifyOtpModal from "@/components/auth/VerifyOtpModal";
+
 function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { login } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
+  const [otpModalOpen, setOtpModalOpen] = useState(false);
+  const [unverifiedEmail, setUnverifiedEmail] = useState("");
 
   const redirectTo = searchParams.get("redirect") || "/dashboard";
 
@@ -63,8 +67,22 @@ function LoginForm() {
         (axiosError.code === "ERR_NETWORK" || !axiosError.response
           ? "Unable to connect to the EquipLink backend server. Please check your connection."
           : "Login failed. Please check your credentials.");
-      toast.error(message);
+
+      if (message.toLowerCase().includes("not verified") || message.toLowerCase().includes("otp")) {
+        setUnverifiedEmail(data.email);
+        setOtpModalOpen(true);
+        toast.info("Please enter the 6-digit OTP sent to your email to verify your account.");
+      } else {
+        toast.error(message);
+      }
     }
+  };
+
+  const handleOtpSuccess = (response: any) => {
+    if (response?.user) {
+      login(response.user);
+    }
+    router.push(redirectTo);
   };
 
   return (
@@ -174,6 +192,14 @@ function LoginForm() {
           Create one
         </Link>
       </p>
+
+      {/* OTP Verification Modal */}
+      <VerifyOtpModal
+        open={otpModalOpen}
+        onOpenChange={setOtpModalOpen}
+        email={unverifiedEmail}
+        onSuccess={handleOtpSuccess}
+      />
     </div>
   );
 }

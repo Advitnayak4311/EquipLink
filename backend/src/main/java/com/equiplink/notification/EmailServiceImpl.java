@@ -43,6 +43,22 @@ public class EmailServiceImpl implements EmailService {
     }
 
     @Override
+    public void sendOtpEmail(User user, String otpCode) {
+        String subject = "EquipLink Email Verification Code: " + otpCode;
+        String htmlContent = buildHtmlTemplate(
+            "Your 6-Digit Email Verification OTP",
+            "<p>Dear " + user.getFirstName() + ",</p>" +
+            "<p>Your 6-digit email verification code for EquipLink is:</p>" +
+            "<div style='text-align: center; margin: 30px 0;'>" +
+            "  <span style='background-color: #0f172a; color: #f97316; font-size: 32px; letter-spacing: 8px; font-family: monospace; padding: 14px 28px; border-radius: 12px; font-weight: 800; border: 2px solid #f97316; display: inline-block;'>" + otpCode + "</span>" +
+            "</div>" +
+            "<p style='text-align: center; color: #64748b; font-size: 14px;'>This OTP code will expire in 10 minutes.</p>" +
+            "<p>If you did not attempt to register or log in, please ignore this email.</p>"
+        );
+        sendHtmlEmail(user.getEmail(), subject, htmlContent);
+    }
+
+    @Override
     public void sendWelcomeEmail(User user) {
         String subject = "Welcome to EquipLink - Your Heavy Machinery Marketplace";
         String htmlContent = buildHtmlTemplate(

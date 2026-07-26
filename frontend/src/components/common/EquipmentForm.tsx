@@ -19,8 +19,6 @@ import { useGenerateDescription, useAnalyzeListing, ListingAnalysisResponse } fr
 
 const currentYear = new Date().getFullYear();
 
-const DEFAULT_EQUIPMENT_IMAGE = "https://images.unsplash.com/photo-1579621970563-ebec7560ff3e?q=80&w=800&auto=format&fit=crop";
-
 // ---- Zod Form Schema ----
 
 const equipmentFormSchema = z.object({
@@ -50,7 +48,7 @@ const equipmentFormSchema = z.object({
   insuranceDocNumber: z.string().optional().nullable().transform((val) => val || ""),
   fitnessDocNumber: z.string().optional().nullable().transform((val) => val || ""),
   operatorLicenseNumber: z.string().optional().nullable().transform((val) => val || ""),
-  imageUrls: z.array(z.string()).optional().default([]).transform((urls) => (urls && urls.length > 0 ? urls : [DEFAULT_EQUIPMENT_IMAGE])),
+  imageUrls: z.array(z.string()).default([]),
 });
 
 export type EquipmentFormValues = z.infer<typeof equipmentFormSchema>;
@@ -98,7 +96,7 @@ export default function EquipmentForm({
       insuranceDocNumber: "",
       fitnessDocNumber: "",
       operatorLicenseNumber: "",
-      imageUrls: [DEFAULT_EQUIPMENT_IMAGE],
+      imageUrls: [],
       ...initialValues,
     },
   });

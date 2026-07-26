@@ -20,6 +20,15 @@ export interface EquipmentCreateRequest {
   dailyRentalPrice: number;
   location: string;
   availabilityStatus: EquipmentStatus;
+  powerType?: "DIESEL" | "ELECTRIC" | "HYBRID";
+  batteryCapacityKwh?: number | null;
+  chargingType?: string;
+  evTermsAccepted?: boolean;
+  inspectionVideoUrl?: string;
+  rcDocNumber?: string;
+  insuranceDocNumber?: string;
+  fitnessDocNumber?: string;
+  operatorLicenseNumber?: string;
   imageUrls: string[];
 }
 

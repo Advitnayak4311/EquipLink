@@ -42,7 +42,8 @@ export default function LiveVideoVerificationModal({
 }: LiveVideoVerificationModalProps) {
   const [verifying, setVerifying] = useState(false);
 
-  const rawUrl = videoUrl && videoUrl.trim() ? videoUrl.trim() : "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4";
+  const hasVideo = Boolean(videoUrl && videoUrl.trim());
+  const rawUrl = hasVideo ? videoUrl!.trim() : "";
   const displayVideoUrl = rawUrl.startsWith("http://") || rawUrl.startsWith("https://")
     ? rawUrl
     : rawUrl.startsWith("/uploads/")
@@ -74,9 +75,9 @@ export default function LiveVideoVerificationModal({
             </DialogTitle>
             <Badge
               variant="outline"
-              className="border-emerald-500/30 text-emerald-700 dark:text-emerald-400 bg-emerald-500/10 text-xs px-2.5 py-0.5 font-bold"
+              className={hasVideo ? "border-emerald-500/30 text-emerald-700 dark:text-emerald-400 bg-emerald-500/10 text-xs px-2.5 py-0.5 font-bold" : "border-amber-500/30 text-amber-700 dark:text-amber-400 bg-amber-500/10 text-xs px-2.5 py-0.5 font-bold"}
             >
-              <CheckCircle2 className="w-3 h-3 mr-1 inline" /> Owner Video Uploaded
+              <CheckCircle2 className="w-3 h-3 mr-1 inline" /> {hasVideo ? "Owner Video Uploaded" : "Video Pending Upload"}
             </Badge>
           </div>
           <DialogDescription className="text-xs text-muted-foreground">
@@ -85,20 +86,29 @@ export default function LiveVideoVerificationModal({
         </DialogHeader>
 
         {/* Detailed Machinery Video Player */}
-        <div className="relative aspect-video w-full rounded-xl bg-black overflow-hidden border shadow-inner flex flex-col justify-between">
-          <video
-            src={displayVideoUrl}
-            controls
-            autoPlay
-            muted
-            className="w-full h-full object-cover"
-            poster="https://images.unsplash.com/photo-1579621970563-ebec7560ff3e?q=80&w=800&auto=format&fit=crop"
-          />
-          <div className="absolute top-3 left-3 bg-background/90 backdrop-blur-md px-3 py-1 rounded-full border shadow-sm text-xs font-semibold text-foreground flex items-center gap-2">
-            <Play className="w-3 h-3 text-amber-500 fill-amber-500" />
-            <span>HD Inspection Walkthrough Video</span>
+        {hasVideo ? (
+          <div className="relative aspect-video w-full rounded-xl bg-black overflow-hidden border shadow-inner flex flex-col justify-between">
+            <video
+              src={displayVideoUrl}
+              controls
+              autoPlay
+              muted
+              className="w-full h-full object-cover"
+            />
+            <div className="absolute top-3 left-3 bg-background/90 backdrop-blur-md px-3 py-1 rounded-full border shadow-sm text-xs font-semibold text-foreground flex items-center gap-2">
+              <Play className="w-3 h-3 text-amber-500 fill-amber-500" />
+              <span>HD Inspection Walkthrough Video</span>
+            </div>
           </div>
-        </div>
+        ) : (
+          <div className="aspect-video w-full rounded-xl bg-muted/20 border border-dashed flex flex-col items-center justify-center p-6 text-center space-y-2">
+            <Video className="w-12 h-12 text-muted-foreground/50" />
+            <h4 className="font-bold text-sm text-foreground">No Inspection Video Uploaded</h4>
+            <p className="text-xs text-muted-foreground max-w-md">
+              The machinery owner has not uploaded a video walkthrough for this equipment listing yet.
+            </p>
+          </div>
+        )}
 
         {/* Inspection Verification Checklist */}
         <div className="p-4 rounded-xl bg-muted/40 border space-y-3 text-xs">

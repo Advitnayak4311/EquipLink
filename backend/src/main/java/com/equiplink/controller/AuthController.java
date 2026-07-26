@@ -48,9 +48,29 @@ public class AuthController {
             HttpServletResponse response
     ) {
         LoginResponse loginResponse = authService.register(request);
-        setCookies(response, loginResponse.accessToken(), loginResponse.refreshToken());
+        if (loginResponse.accessToken() != null && !loginResponse.accessToken().isBlank()) {
+            setCookies(response, loginResponse.accessToken(), loginResponse.refreshToken());
+        }
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(BaseResponse.success("User registration successful", loginResponse));
+                .body(BaseResponse.success("Account registered. A 6-digit OTP code has been sent to your email for verification.", loginResponse));
+    }
+
+    @Operation(summary = "Verify 6-digit Email OTP code")
+    @PostMapping("/verify-otp")
+    public ResponseEntity<BaseResponse<LoginResponse>> verifyOtp(
+            @Valid @RequestBody com.equiplink.dto.request.VerifyOtpRequest request,
+            HttpServletResponse response
+    ) {
+        LoginResponse loginResponse = authService.verifyOtp(request);
+        setCookies(response, loginResponse.accessToken(), loginResponse.refreshToken());
+        return ResponseEntity.ok(BaseResponse.success("Email verified successfully!", loginResponse));
+    }
+
+    @Operation(summary = "Resend 6-digit Email OTP code")
+    @PostMapping("/send-otp")
+    public ResponseEntity<BaseResponse<Void>> sendOtp(@RequestParam String email) {
+        authService.sendOtp(email);
+        return ResponseEntity.ok(BaseResponse.success("A fresh 6-digit verification OTP code has been sent to your email."));
     }
 
     @Operation(summary = "Login using email and password credentials")

@@ -23,6 +23,10 @@ public interface AuthService {
 
     void resetPassword(String token, String newPassword);
 
+    LoginResponse verifyOtp(com.equiplink.dto.request.VerifyOtpRequest request);
+
+    void sendOtp(String email);
+
     void verifyEmail(String token);
 
     void resendVerificationEmail(String email);

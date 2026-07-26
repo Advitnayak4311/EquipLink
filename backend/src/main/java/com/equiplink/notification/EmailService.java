@@ -10,6 +10,8 @@ public interface EmailService {
 
     void sendVerificationEmail(User user, String verificationLink);
 
+    void sendOtpEmail(User user, String otpCode);
+
     void sendWelcomeEmail(User user);
 
     void sendForgotPasswordEmail(User user, String resetLink);

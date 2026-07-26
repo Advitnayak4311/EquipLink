@@ -30,6 +30,21 @@ export const authApi = {
   },
 
   /**
+   * Verify 6-digit Email OTP.
+   */
+  verifyOtp: async (data: { email: string; otp: string }): Promise<LoginResponse> => {
+    const response = await apiClient.post<BaseResponse<LoginResponse>>("/auth/verify-otp", data);
+    return response.data.data;
+  },
+
+  /**
+   * Resend 6-digit Email OTP.
+   */
+  sendOtp: async (email: string): Promise<void> => {
+    await apiClient.post<BaseResponse<void>>(`/auth/send-otp?email=${encodeURIComponent(email)}`);
+  },
+
+  /**
    * Logout and clear the cookies.
    */
   logout: async (): Promise<void> => {

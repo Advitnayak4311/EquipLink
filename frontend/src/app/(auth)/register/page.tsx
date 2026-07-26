@@ -40,10 +40,14 @@ type RegisterFormValues = z.infer<typeof registerSchema>;
 
 // ---- Component ----
 
+import VerifyOtpModal from "@/components/auth/VerifyOtpModal";
+
 export default function RegisterPage() {
   const router = useRouter();
   const { login } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
+  const [otpModalOpen, setOtpModalOpen] = useState(false);
+  const [registeredEmail, setRegisteredEmail] = useState("");
 
   const {
     register,
@@ -63,7 +67,7 @@ export default function RegisterPage() {
 
   const onSubmit = async (data: RegisterFormValues) => {
     try {
-      const response = await authApi.register({
+      await authApi.register({
         firstName: data.firstName,
         lastName: data.lastName,
         email: data.email,
@@ -73,9 +77,9 @@ export default function RegisterPage() {
         role: data.role,
         acceptTerms: data.acceptTerms,
       });
-      login(response.user);
-      toast.success("Account created successfully!");
-      router.push("/dashboard");
+      setRegisteredEmail(data.email);
+      setOtpModalOpen(true);
+      toast.success("Account created! Please enter the 6-digit OTP sent to your email.");
     } catch (err) {
       const axiosError = err as AxiosError<ApiError>;
       const message =
@@ -85,6 +89,13 @@ export default function RegisterPage() {
           : "Registration failed. Please try again.");
       toast.error(message);
     }
+  };
+
+  const handleOtpSuccess = (response: any) => {
+    if (response?.user) {
+      login(response.user);
+    }
+    router.push("/dashboard");
   };
 
   return (
@@ -286,6 +297,14 @@ export default function RegisterPage() {
           Sign in
         </Link>
       </p>
+
+      {/* OTP Verification Modal */}
+      <VerifyOtpModal
+        open={otpModalOpen}
+        onOpenChange={setOtpModalOpen}
+        email={registeredEmail}
+        onSuccess={handleOtpSuccess}
+      />
     </div>
   );
 }

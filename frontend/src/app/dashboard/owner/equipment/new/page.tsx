@@ -31,6 +31,11 @@ export default function NewEquipmentPage() {
         batteryCapacityKwh: values.batteryCapacityKwh,
         chargingType: values.chargingType,
         evTermsAccepted: values.evTermsAccepted,
+        inspectionVideoUrl: values.inspectionVideoUrl,
+        rcDocNumber: values.rcDocNumber,
+        insuranceDocNumber: values.insuranceDocNumber,
+        fitnessDocNumber: values.fitnessDocNumber,
+        operatorLicenseNumber: values.operatorLicenseNumber,
         imageUrls: values.imageUrls,
       });
       toast.success("Equipment listed successfully!");
