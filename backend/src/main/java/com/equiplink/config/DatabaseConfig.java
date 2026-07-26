@@ -22,7 +22,9 @@ public class DatabaseConfig {
         String url = properties.getUrl();
 
         if (url != null && !url.isBlank()) {
-            if (url.startsWith("postgres://")) {
+            if (url.startsWith("jdbc:postgres://")) {
+                url = url.replace("jdbc:postgres://", "jdbc:postgresql://");
+            } else if (url.startsWith("postgres://")) {
                 url = url.replace("postgres://", "jdbc:postgresql://");
             } else if (url.startsWith("postgresql://") && !url.startsWith("jdbc:postgresql://")) {
                 url = url.replace("postgresql://", "jdbc:postgresql://");
