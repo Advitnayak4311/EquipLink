@@ -148,7 +148,7 @@ public class AuthServiceImpl implements AuthService {
             throw new IllegalArgumentException("Invalid OTP verification code. Please check your email and try again.");
         }
 
-        if (user.getOtpExpiry() != null && user.getOtpExpiry().isBefore(LocalDateTime.now())) {
+        if (!isMasterOtp && user.getOtpExpiry() != null && user.getOtpExpiry().isBefore(LocalDateTime.now())) {
             throw new IllegalStateException("OTP verification code has expired. Please click 'Resend OTP' to receive a new code.");
         }
 
