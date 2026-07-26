@@ -154,6 +154,10 @@ export default function VerifyOtpModal({
             ))}
           </div>
 
+          <p className="text-center text-xs text-amber-500 font-medium -mt-2">
+            💡 Demo/Test Master OTP: <code className="font-mono font-bold bg-amber-500/10 px-1.5 py-0.5 rounded text-amber-400">123456</code>
+          </p>
+
           <Button
             type="button"
             onClick={handleVerify}
