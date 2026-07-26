@@ -162,29 +162,31 @@ public class EmailServiceImpl implements EmailService {
     }
 
     private void sendHtmlEmail(String to, String subject, String htmlContent) {
-        log.info("Preparing to send email to: {} | Subject: {}", to, subject);
+        java.util.concurrent.CompletableFuture.runAsync(() -> {
+            log.info("Preparing to send email to: {} | Subject: {}", to, subject);
 
-        if (mailSender == null) {
-            log.warn("JavaMailSender bean is not configured on SMTP. Logging email content instead:");
-            log.info("\n=== [MOCK SMTP EMAIL SENT] ===\nTo: {}\nSubject: {}\nContent:\n{}\n===============================", to, subject, htmlContent);
-            return;
-        }
+            if (mailSender == null) {
+                log.warn("JavaMailSender bean is not configured on SMTP. Logging email content instead:");
+                log.info("\n=== [MOCK SMTP EMAIL SENT] ===\nTo: {}\nSubject: {}\nContent:\n{}\n===============================", to, subject, htmlContent);
+                return;
+            }
 
-        try {
-            MimeMessage message = mailSender.createMimeMessage();
-            MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
-            
-            helper.setFrom(fromEmail);
-            helper.setTo(to);
-            helper.setSubject(subject);
-            helper.setText(htmlContent, true);
+            try {
+                MimeMessage message = mailSender.createMimeMessage();
+                MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+                
+                helper.setFrom(fromEmail);
+                helper.setTo(to);
+                helper.setSubject(subject);
+                helper.setText(htmlContent, true);
 
-            mailSender.send(message);
-            log.info("Email successfully sent to {}", to);
-        } catch (Exception e) {
-            log.error("Failed to send SMTP email to {}. Falling back to console log. Error: {}", to, e.getMessage());
-            log.info("\n=== [SMTP ERROR FALLBACK EMAIL] ===\nTo: {}\nSubject: {}\nContent:\n{}\n===============================", to, subject, htmlContent);
-        }
+                mailSender.send(message);
+                log.info("Email successfully sent to {}", to);
+            } catch (Exception e) {
+                log.error("Failed to send SMTP email to {}. Falling back to console log. Error: {}", to, e.getMessage());
+                log.info("\n=== [SMTP ERROR FALLBACK EMAIL] ===\nTo: {}\nSubject: {}\nContent:\n{}\n===============================", to, subject, htmlContent);
+            }
+        });
     }
 
     private String buildHtmlTemplate(String title, String bodyContent) {
