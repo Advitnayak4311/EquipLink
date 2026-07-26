@@ -15,10 +15,18 @@ services:
     envVars:
       - key: SPRING_PROFILES_ACTIVE
         value: prod
-      - key: DATABASE_URL
+      - key: DATABASE_HOST
         fromDatabase:
           name: equiplink-postgres
-          property: connectionString
+          property: host
+      - key: DATABASE_PORT
+        fromDatabase:
+          name: equiplink-postgres
+          property: port
+      - key: DATABASE_NAME
+        fromDatabase:
+          name: equiplink-postgres
+          property: database
       - key: DATABASE_USERNAME
         fromDatabase:
           name: equiplink-postgres
