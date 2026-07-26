@@ -13,6 +13,17 @@ spring:
     hibernate:
       ddl-auto: update
     show-sql: false
+  mail:
+    host: ${SMTP_HOST:smtp.gmail.com}
+    port: ${SMTP_PORT:587}
+    username: ${SMTP_USERNAME:attendancesystemcec@gmail.com}
+    password: ${SMTP_PASSWORD:jfpkwlutdusnvhnq}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
 
 app:
   jwt:
